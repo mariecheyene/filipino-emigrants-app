@@ -1,0 +1,501 @@
+/* Province Origin Page Styles - Dark Theme */
+.province-origin-page {
+  padding: 1.25rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Page Header */
+.province-origin-page .page-header {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.province-origin-page .page-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.province-origin-page .page-header p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Charts Grid - UPDATED LAYOUT */
+.province-origin-page .charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.province-origin-page .charts-grid.blurred {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Chart Cards */
+.province-origin-page .chart-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.province-origin-page .chart-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-light);
+}
+
+.province-origin-page .chart-card.full-width {
+  grid-column: 1 / -1;
+  height: 400px;
+}
+
+/* Composition Chart - Centered at bottom */
+.province-origin-page .chart-card:not(.full-width) {
+  height: 400px;
+  justify-self: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Chart Header */
+.province-origin-page .chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
+  gap: 1rem;
+}
+
+.province-origin-page .chart-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.province-origin-page .chart-icon {
+  color: var(--primary);
+  font-size: 1.1rem;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 0.5rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.province-origin-page .chart-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.province-origin-page .chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Chart Filters */
+.province-origin-page .chart-filters-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.province-origin-page .chart-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.province-origin-page .chart-filter label {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.province-origin-page .chart-filter select,
+.province-origin-page .chart-filter input {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-light);
+  color: var(--text);
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+  min-width: 120px;
+}
+
+.province-origin-page .chart-filter select:focus,
+.province-origin-page .chart-filter input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+  background: var(--surface);
+}
+
+.province-origin-page .chart-filter input {
+  width: 70px;
+  text-align: center;
+}
+
+.province-origin-page .range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.province-origin-page .range-inputs span {
+  color: var(--text-light);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Fullscreen Button */
+.province-origin-page .fullscreen-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.province-origin-page .fullscreen-btn:hover {
+  background: var(--surface-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Chart Content */
+.province-origin-page .chart-content {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Full Screen Overlay - MATCHING DASHBOARD STYLE */
+.province-origin-page .fullscreen-chart-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  backdrop-filter: blur(8px);
+}
+
+.province-origin-page .fullscreen-chart-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  width: 95vw;
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
+  position: relative;
+}
+
+.province-origin-page .fullscreen-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.province-origin-page .fullscreen-chart-header h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.province-origin-page .close-fullscreen {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.province-origin-page .close-fullscreen:hover {
+  background: #DC2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.province-origin-page .fullscreen-chart-content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Empty State */
+.province-origin-page .empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.province-origin-page .empty-state h3 {
+  color: var(--text);
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.province-origin-page .empty-state p {
+  font-size: 0.9rem;
+  margin: 0;
+  color: var(--text-light);
+}
+
+/* Recharts Customization for Dark Theme */
+.province-origin-page .recharts-cartesian-grid-horizontal line,
+.province-origin-page .recharts-cartesian-grid-vertical line {
+  stroke: var(--border);
+  stroke-dasharray: 3 3;
+}
+
+.province-origin-page .recharts-text {
+  fill: var(--text-light);
+  font-size: 0.8rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.province-origin-page .recharts-label {
+  fill: var(--text-light);
+  font-family: 'Inter', sans-serif;
+}
+
+.province-origin-page .recharts-tooltip-wrapper {
+  z-index: 100;
+}
+
+.province-origin-page .recharts-default-tooltip {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.province-origin-page .recharts-tooltip-item {
+  color: var(--text) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.province-origin-page .recharts-tooltip-item-name {
+  color: var(--text-light) !important;
+}
+
+.province-origin-page .recharts-legend-wrapper {
+  color: var(--text-light);
+}
+
+.province-origin-page .recharts-legend-item-text {
+  color: var(--text-light) !important;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Responsive Design */
+@media (min-width: 1200px) {
+  .province-origin-page .charts-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  
+  .province-origin-page .chart-card.full-width {
+    grid-column: 1 / -1;
+  }
+  
+  /* Center the composition chart */
+  .province-origin-page .chart-card:not(.full-width) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-width: 600px;
+    margin-top: 0.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .province-origin-page .chart-card:not(.full-width) {
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .province-origin-page {
+    padding: 1rem;
+  }
+  
+  .province-origin-page .chart-card {
+    height: 350px !important;
+  }
+  
+  .province-origin-page .chart-card:not(.full-width) {
+    max-width: 100%;
+    justify-self: stretch;
+  }
+  
+  .province-origin-page .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .province-origin-page .chart-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .province-origin-page .chart-filters-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    width: 100%;
+  }
+  
+  .province-origin-page .chart-filter {
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .province-origin-page .chart-filter select,
+  .province-origin-page .chart-filter input {
+    min-width: auto;
+    flex: 1;
+  }
+  
+  .province-origin-page .fullscreen-chart-overlay {
+    padding: 1rem;
+  }
+  
+  .province-origin-page .fullscreen-chart-container {
+    padding: 1rem;
+  }
+  
+  .province-origin-page .fullscreen-chart-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .province-origin-page .fullscreen-chart-header h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .province-origin-page {
+    padding: 0.75rem;
+  }
+  
+  .province-origin-page .chart-card {
+    padding: 1rem;
+    height: 320px !important;
+  }
+  
+  .province-origin-page .chart-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .province-origin-page .range-inputs {
+    justify-content: center;
+  }
+  
+  .province-origin-page .chart-card:not(.full-width) {
+    max-width: 100%;
+  }
+}
+
+/* Animation for chart transitions */
+.province-origin-page .chart-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Composition Chart Specific Styles */
+.province-origin-page .composition-chart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.province-origin-page .composition-chart .chart-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

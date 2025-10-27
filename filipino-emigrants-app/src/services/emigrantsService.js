@@ -93,7 +93,7 @@ export const getDocuments = async (collectionName) => {
   }
 };
 
-// Get all data with SINGLE optimized fetch
+// Get all data with SINGLE optimized fetch - FIXED VERSION
 export const getAllData = async () => {
   // Return cached data if valid
   if (isCacheValid() && dataCache.civilStatus !== null) {
@@ -123,23 +123,37 @@ export const getAllData = async () => {
     
     const allData = {};
     
-    // Fetch all collections in parallel - this counts as ONE read operation
+    // Fetch all collections in parallel - FIXED: Properly await all promises
     const promises = collections.map(async (collName) => {
-      const snapshot = await getDocs(collection(db, collName));
-      const documents = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      // Filter out dummy documents
-      const validDocuments = documents.filter(item => !item.created);
-      allData[collName] = validDocuments;
-      dataCache[collName] = validDocuments; // Update cache
+      try {
+        console.log(`📖 Fetching ${collName}...`);
+        const snapshot = await getDocs(collection(db, collName));
+        const documents = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        // Filter out dummy documents
+        const validDocuments = documents.filter(item => !item.created);
+        console.log(`✅ ${collName}: ${validDocuments.length} documents loaded`);
+        return { collection: collName, data: validDocuments };
+      } catch (error) {
+        console.error(`❌ Error fetching ${collName}:`, error);
+        return { collection: collName, data: [] };
+      }
     });
 
-    await Promise.all(promises);
+    // Wait for all promises to complete
+    const results = await Promise.all(promises);
+    
+    // Organize the results into allData object
+    results.forEach(result => {
+      allData[result.collection] = result.data;
+      dataCache[result.collection] = result.data; // Update cache
+    });
+    
     dataCache.lastFetch = Date.now();
 
-    console.log('🎉 All data loaded successfully with single fetch');
+    console.log('🎉 All data loaded successfully:', allData);
     return allData;
     
   } catch (error) {
@@ -147,6 +161,7 @@ export const getAllData = async () => {
       throw error;
     }
     console.error('❌ Error in getAllData:', error);
+    // Return empty structure but don't throw to prevent component crash
     return {
       civilStatus: [],
       sexData: [],
@@ -198,7 +213,7 @@ export const getCollectionStats = async () => {
   return stats;
 };
 
-// COMPATIBLE CSV IMPORT - Uses proper field mapping
+// COMPATIBLE CSV IMPORT - Uses your previous field mapping
 export const importCSVData = async (jsonData, dataType) => {
   try {
     console.log(`📤 Importing ${dataType}:`, jsonData.length, 'records');
@@ -233,12 +248,22 @@ export const importCSVData = async (jsonData, dataType) => {
     const batch = writeBatch(db);
     const collectionRef = collection(db, collectionName);
     
-    // Process data with proper field mapping
+    // Process data with field cleaning logic
     jsonData.forEach((item) => {
       const docRef = doc(collectionRef);
       
-      // Clean and map data based on collection type
-      const cleanData = cleanCSVData(item, dataType);
+      // Clean the data - convert numbers
+      const cleanData = {};
+      Object.keys(item).forEach(key => {
+        const value = item[key];
+        
+        // Convert numeric strings to numbers
+        if (typeof value === 'string' && value.trim() !== '' && !isNaN(value)) {
+          cleanData[key] = Number(value);
+        } else {
+          cleanData[key] = value;
+        }
+      });
       
       // Add import timestamp
       cleanData.importedAt = new Date();
@@ -287,78 +312,6 @@ export const importCSVData = async (jsonData, dataType) => {
     
     throw error;
   }
-};
-
-// Clean CSV data based on collection type
-const cleanCSVData = (item, dataType) => {
-  const cleanData = {};
-  
-  switch(dataType) {
-    case 'civilStatus':
-      cleanData.year = parseInt(item.year) || new Date().getFullYear();
-      cleanData.single = parseInt(item.single) || 0;
-      cleanData.married = parseInt(item.married) || 0;
-      cleanData.widowed = parseInt(item.widowed) || 0;
-      cleanData.divorced = parseInt(item.divorced) || 0;
-      cleanData.notReported = parseInt(item.notReported) || 0;
-      break;
-      
-    case 'sexData':
-      cleanData.year = parseInt(item.year) || new Date().getFullYear();
-      cleanData.male = parseInt(item.male) || 0;
-      cleanData.female = parseInt(item.female) || 0;
-      break;
-      
-    case 'ageData':
-      cleanData.year = parseInt(item.year) || new Date().getFullYear();
-      cleanData.ageGroup = item.ageGroup || 'Unknown';
-      cleanData.count = parseInt(item.count) || 0;
-      break;
-      
-    case 'educationData':
-      cleanData.year = parseInt(item.year) || new Date().getFullYear();
-      cleanData.educationLevel = item.educationLevel || 'Unknown';
-      cleanData.count = parseInt(item.count) || 0;
-      break;
-      
-    case 'occupationData':
-      cleanData.year = parseInt(item.year) || new Date().getFullYear();
-      cleanData.occupation = item.occupation || 'Unknown';
-      cleanData.count = parseInt(item.count) || 0;
-      break;
-      
-    case 'placeOfOrigin':
-      cleanData.year = parseInt(item.year) || new Date().getFullYear();
-      cleanData.region = item.region || 'Unknown';
-      cleanData.count = parseInt(item.count) || 0;
-      break;
-      
-    case 'placeOfOriginProvince':
-      cleanData.year = parseInt(item.year) || new Date().getFullYear();
-      cleanData.province = item.province || 'Unknown';
-      cleanData.count = parseInt(item.count) || 0;
-      break;
-      
-    case 'allCountries':
-    case 'majorCountries':
-      cleanData.year = parseInt(item.year) || new Date().getFullYear();
-      cleanData.country = item.country || 'Unknown';
-      cleanData.count = parseInt(item.count) || 0;
-      break;
-      
-    default:
-      // Generic cleaning for unknown types
-      Object.keys(item).forEach(key => {
-        const value = item[key];
-        if (typeof value === 'string' && value.trim() !== '' && !isNaN(value)) {
-          cleanData[key] = Number(value);
-        } else {
-          cleanData[key] = value;
-        }
-      });
-  }
-  
-  return cleanData;
 };
 
 // ==================== FULL CRUD OPERATIONS ====================
@@ -451,32 +404,6 @@ export const deleteDocument = async (collectionName, documentId) => {
   }
 };
 
-// DELETE ALL - Delete all documents from a collection
-export const deleteAllDocuments = async (collectionName) => {
-  try {
-    console.log(`🗑️ Deleting ALL documents from ${collectionName}`);
-    
-    const snapshot = await getDocs(collection(db, collectionName));
-    const batch = writeBatch(db);
-    
-    snapshot.forEach((document) => {
-      batch.delete(doc(db, collectionName, document.id));
-    });
-    
-    await batch.commit();
-    
-    // Clear cache
-    clearCache();
-    
-    console.log(`✅ All documents deleted from ${collectionName}`);
-    return { success: true, deleted: snapshot.size };
-    
-  } catch (error) {
-    console.error(`❌ Error deleting all documents from ${collectionName}:`, error);
-    throw error;
-  }
-};
-
 // Safe data access with fallbacks
 export const getSafeData = async () => {
   try {
@@ -514,75 +441,26 @@ export const getPlaceOfOriginProvince = async () => await getDocuments('placeOfO
 export const getAllCountries = async () => await getDocuments('allCountries');
 export const getMajorCountries = async () => await getDocuments('majorCountries');
 
-// Collection field definitions for forms
-export const getCollectionFields = (collectionName) => {
-  const fieldDefinitions = {
-    civilStatus: [
-      { name: 'year', type: 'number', label: 'Year', required: true, min: 1981, max: 2020 },
-      { name: 'single', type: 'number', label: 'Single', required: true, min: 0 },
-      { name: 'married', type: 'number', label: 'Married', required: true, min: 0 },
-      { name: 'widowed', type: 'number', label: 'Widowed', required: true, min: 0 },
-      { name: 'divorced', type: 'number', label: 'Divorced', required: true, min: 0 },
-      { name: 'notReported', type: 'number', label: 'Not Reported', required: true, min: 0 }
-    ],
-    sexData: [
-      { name: 'year', type: 'number', label: 'Year', required: true, min: 1981, max: 2020 },
-      { name: 'male', type: 'number', label: 'Male Count', required: true, min: 0 },
-      { name: 'female', type: 'number', label: 'Female Count', required: true, min: 0 }
-    ],
-    ageData: [
-      { name: 'year', type: 'number', label: 'Year', required: true, min: 1981, max: 2020 },
-      { name: 'ageGroup', type: 'select', label: 'Age Group', required: true, 
-        options: ['15-19', '20-24', '25-29', '30-34', '35-39', '40-44', '45-49', '50-54', '55-59', '60+'] },
-      { name: 'count', type: 'number', label: 'Count', required: true, min: 0 }
-    ],
-    educationData: [
-      { name: 'year', type: 'number', label: 'Year', required: true, min: 1981, max: 2020 },
-      { name: 'educationLevel', type: 'select', label: 'Education Level', required: true,
-        options: ['No Education', 'Elementary', 'High School', 'College', 'Postgraduate', 'Not Reported'] },
-      { name: 'count', type: 'number', label: 'Count', required: true, min: 0 }
-    ],
-    occupationData: [
-      { name: 'year', type: 'number', label: 'Year', required: true, min: 1981, max: 2020 },
-      { name: 'occupation', type: 'select', label: 'Occupation', required: true,
-        options: ['Healthcare Professional', 'Engineer', 'IT Professional', 'Teacher', 'Domestic Worker', 
-                 'Seafarer', 'Construction Worker', 'Factory Worker', 'Sales Worker', 'Not Reported'] },
-      { name: 'count', type: 'number', label: 'Count', required: true, min: 0 }
-    ],
-    placeOfOrigin: [
-      { name: 'year', type: 'number', label: 'Year', required: true, min: 1981, max: 2020 },
-      { name: 'region', type: 'select', label: 'Region', required: true,
-        options: ['NCR', 'Region I', 'Region II', 'Region III', 'Region IV-A', 'Region IV-B', 
-                 'Region V', 'Region VI', 'Region VII', 'Region VIII', 'Region IX', 'Region X',
-                 'Region XI', 'Region XII', 'CAR', 'BARMM'] },
-      { name: 'count', type: 'number', label: 'Count', required: true, min: 0 }
-    ],
-    placeOfOriginProvince: [
-      { name: 'year', type: 'number', label: 'Year', required: true, min: 1981, max: 2020 },
-      { name: 'province', type: 'text', label: 'Province', required: true },
-      { name: 'count', type: 'number', label: 'Count', required: true, min: 0 }
-    ],
-    allCountries: [
-      { name: 'year', type: 'number', label: 'Year', required: true, min: 1981, max: 2020 },
-      { name: 'country', type: 'select', label: 'Country', required: true,
-        options: ['United States', 'Saudi Arabia', 'United Arab Emirates', 'Canada', 'Japan', 
-                 'United Kingdom', 'Australia', 'Singapore', 'Qatar', 'Kuwait', 'Hong Kong', 
-                 'Taiwan', 'Malaysia', 'South Korea', 'Germany', 'Other'] },
-      { name: 'count', type: 'number', label: 'Count', required: true, min: 0 }
-    ],
-    majorCountries: [
-      { name: 'year', type: 'number', label: 'Year', required: true, min: 1981, max: 2020 },
-      { name: 'country', type: 'select', label: 'Country', required: true,
-        options: ['United States', 'Saudi Arabia', 'United Arab Emirates', 'Canada', 'Japan', 
-                 'United Kingdom', 'Australia', 'Singapore'] },
-      { name: 'count', type: 'number', label: 'Count', required: true, min: 0 }
-    ]
-  };
-  
-  return fieldDefinitions[collectionName] || [];
+// Additional utility functions
+export const clearCollection = async (collectionName) => {
+  try {
+    const snapshot = await getDocs(collection(db, collectionName));
+    const batch = writeBatch(db);
+    
+    snapshot.forEach((document) => {
+      batch.delete(doc(db, collectionName, document.id));
+    });
+    
+    await batch.commit();
+    console.log(`✅ Cleared collection: ${collectionName}`);
+    return { success: true, cleared: snapshot.size };
+  } catch (error) {
+    console.error(`❌ Error clearing collection ${collectionName}:`, error);
+    throw error;
+  }
 };
 
-// Delete all data function (alias for deleteAllDocuments for compatibility)
+// Delete all data function
 export const deleteAllData = async (dataType) => {
   try {
     const collectionMap = {
@@ -612,25 +490,6 @@ export const deleteAllData = async (dataType) => {
     
   } catch (error) {
     console.error(`Error deleting ${dataType} data:`, error);
-    throw error;
-  }
-};
-
-// Clear collection utility
-export const clearCollection = async (collectionName) => {
-  try {
-    const snapshot = await getDocs(collection(db, collectionName));
-    const batch = writeBatch(db);
-    
-    snapshot.forEach((document) => {
-      batch.delete(doc(db, collectionName, document.id));
-    });
-    
-    await batch.commit();
-    console.log(`✅ Cleared collection: ${collectionName}`);
-    return { success: true, cleared: snapshot.size };
-  } catch (error) {
-    console.error(`❌ Error clearing collection ${collectionName}:`, error);
     throw error;
   }
 };

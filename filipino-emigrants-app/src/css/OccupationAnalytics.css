@@ -1,0 +1,234 @@
+/* Occupation Analytics Specific Styles */
+.occupation-analytics-page .charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.occupation-analytics-page .charts-grid .chart-card.full-width {
+  grid-column: 1 / -1;
+}
+
+/* For larger screens, show 2x2 grid */
+@media (min-width: 1200px) {
+  .occupation-analytics-page .charts-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+  
+  .occupation-analytics-page .charts-grid .chart-card.full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Chart Card Styles */
+.occupation-analytics-page .chart-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+}
+
+.occupation-analytics-page .chart-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.occupation-analytics-page .chart-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.occupation-analytics-page .chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
+  gap: 1rem;
+}
+
+.occupation-analytics-page .chart-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.occupation-analytics-page .chart-icon {
+  color: var(--primary);
+  font-size: 1.1rem;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.occupation-analytics-page .chart-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.occupation-analytics-page .chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Chart Filter Styles */
+.occupation-analytics-page .chart-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.occupation-analytics-page .chart-filter label {
+  color: var(--text-light);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.occupation-analytics-page .chart-filter select,
+.occupation-analytics-page .chart-filter input {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-light);
+  color: var(--text);
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.occupation-analytics-page .chart-filter select:focus,
+.occupation-analytics-page .chart-filter input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.occupation-analytics-page .range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.occupation-analytics-page .range-inputs input {
+  width: 70px;
+  text-align: center;
+}
+
+.occupation-analytics-page .range-inputs span {
+  color: var(--text-light);
+  font-size: 0.75rem;
+}
+
+.occupation-analytics-page .fullscreen-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.occupation-analytics-page .fullscreen-btn:hover {
+  background: var(--surface-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.occupation-analytics-page .chart-content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Blur effect when full screen is active */
+.occupation-analytics-page .charts-grid.blurred {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Empty State */
+.occupation-analytics-page .empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.occupation-analytics-page .empty-state h3 {
+  color: var(--text);
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.occupation-analytics-page .empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .occupation-analytics-page .charts-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  
+  .occupation-analytics-page .chart-card {
+    height: 350px;
+  }
+  
+  .occupation-analytics-page .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .occupation-analytics-page .chart-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .occupation-analytics-page .chart-card {
+    padding: 1rem;
+    height: 300px;
+  }
+  
+  .occupation-analytics-page .chart-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

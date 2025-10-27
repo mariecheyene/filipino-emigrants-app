@@ -1,0 +1,548 @@
+/* CivilStatusPage.css - Namespaced to avoid conflicts */
+.civil-status-container {
+  padding: 1.25rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+/* Header - Namespaced */
+.civil-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: var(--surface);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.civil-status-header-content h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.civil-status-header-content p {
+  margin: 0.5rem 0 0 0;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.civil-status-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Civil Status specific buttons */
+.civil-status-btn-primary,
+.civil-status-btn-secondary {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.civil-status-btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.civil-status-btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.civil-status-btn-secondary {
+  background: var(--surface-light);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.civil-status-btn-secondary:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.civil-status-stat-badge {
+  background: var(--surface-light);
+  color: var(--text);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+
+/* Civil Status Charts Grid */
+.civil-status-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.civil-status-charts-grid.blurred {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.civil-status-chart-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+}
+
+.civil-status-chart-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.civil-status-chart-card.civil-status-full-width {
+  grid-column: 1 / -1;
+}
+
+.civil-status-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
+  gap: 1rem;
+}
+
+.civil-status-chart-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.civil-status-chart-icon {
+  color: var(--primary);
+  font-size: 1.1rem;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.civil-status-chart-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.civil-status-chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Civil Status Chart Filter Styles */
+.civil-status-chart-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.civil-status-chart-filter label {
+  color: var(--text-light);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.civil-status-chart-filter select,
+.civil-status-chart-filter input {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-light);
+  color: var(--text);
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.civil-status-chart-filter select:focus,
+.civil-status-chart-filter input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.civil-status-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.civil-status-range-inputs input {
+  width: 70px;
+  text-align: center;
+}
+
+.civil-status-range-inputs span {
+  color: var(--text-light);
+  font-size: 0.75rem;
+}
+
+.civil-status-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.civil-status-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.civil-status-checkbox-label input {
+  margin: 0;
+}
+
+.civil-status-fullscreen-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.civil-status-fullscreen-btn:hover {
+  background: var(--surface-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.civil-status-chart-content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.civil-status-no-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+/* Civil Status Full Screen Chart Overlay */
+.civil-status-fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  backdrop-filter: blur(8px);
+}
+
+.civil-status-fullscreen-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  width: 95vw;
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
+  position: relative;
+}
+
+.civil-status-fullscreen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.civil-status-fullscreen-header h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.civil-status-close-fullscreen {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.civil-status-close-fullscreen:hover {
+  background: #DC2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.civil-status-fullscreen-content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Civil Status Loading State */
+.civil-status-loading {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.civil-status-spinner {
+  animation: civil-status-spin 1s linear infinite;
+  color: var(--primary);
+}
+
+@keyframes civil-status-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Civil Status Error State */
+.civil-status-error {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.civil-status-error-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Civil Status Empty State */
+.civil-status-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+/* Civil Status Read Stats */
+.civil-status-read-stats {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.civil-status-read-stats small {
+  color: var(--text-light);
+  font-size: 0.75rem;
+}
+
+/* Responsive Design for Civil Status Page */
+@media (min-width: 1200px) {
+  .civil-status-charts-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+  
+  .civil-status-chart-card.civil-status-full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .civil-status-container {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .civil-status-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .civil-status-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .civil-status-chart-card {
+    height: 350px;
+  }
+  
+  .civil-status-chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .civil-status-chart-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .civil-status-checkbox-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .civil-status-fullscreen-overlay {
+    padding: 1rem;
+  }
+  
+  .civil-status-fullscreen-container {
+    padding: 1rem;
+  }
+  
+  .civil-status-fullscreen-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .civil-status-checkbox-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .civil-status-range-inputs {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .civil-status-range-inputs input {
+    width: 100%;
+  }
+  
+  .civil-status-error-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .civil-status-error-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Animation for civil status chart transitions */
+.civil-status-chart-card {
+  animation: civil-status-fadeInUp 0.5s ease-out;
+}
+
+@keyframes civil-status-fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Add this to your existing CivilStatusPage.css */
+
+/* Centered chart for composition */
+.civil-status-chart-card.civil-status-centered {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: 50%;
+  max-width: 600px;
+  margin-top: 1rem;
+}
+
+/* Adjust charts grid for the new layout */
+.civil-status-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+/* Responsive adjustments for centered chart */
+@media (max-width: 768px) {
+  .civil-status-chart-card.civil-status-centered {
+    width: 90%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .civil-status-chart-card.civil-status-centered {
+    width: 100%;
+  }
+}

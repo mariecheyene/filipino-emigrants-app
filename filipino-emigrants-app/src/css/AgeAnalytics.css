@@ -1,0 +1,362 @@
+/* Age Analytics Page Specific Styles */
+.age-analytics-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.age-analytics-page .charts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+}
+
+/* Top row - two equal charts that occupy full available space */
+.age-analytics-page .charts-top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  height: 400px;
+  min-height: 400px;
+}
+
+/* Bottom row - single large chart with proper spacing */
+.age-analytics-page .charts-bottom-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 450px;
+  min-height: 450px;
+  margin-top: 2rem;
+}
+
+/* Centered trend chart with max width */
+.age-analytics-page .centered-trend-chart {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  height: 100%;
+}
+
+/* Ensure chart cards fill their containers */
+.age-analytics-page .chart-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+}
+
+.age-analytics-page .chart-card .chart-content {
+  flex: 1;
+  min-height: 300px;
+  height: 100%;
+}
+
+/* Chart header with proper controls alignment */
+.age-analytics-page .chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
+  gap: 1rem;
+}
+
+.age-analytics-page .chart-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.age-analytics-page .chart-icon {
+  color: var(--primary);
+  font-size: 1.1rem;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.age-analytics-page .chart-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Chart controls - filters and fullscreen button */
+.age-analytics-page .chart-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.age-analytics-page .chart-filters-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.age-analytics-page .chart-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.age-analytics-page .chart-filter label {
+  color: var(--text-light);
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.age-analytics-page .chart-filter select,
+.age-analytics-page .chart-filter input {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-light);
+  color: var(--text);
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.age-analytics-page .chart-filter select:focus,
+.age-analytics-page .chart-filter input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.age-analytics-page .range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.age-analytics-page .range-inputs input {
+  width: 70px;
+  text-align: center;
+}
+
+.age-analytics-page .range-inputs span {
+  color: var(--text-light);
+  font-size: 0.8rem;
+}
+
+/* Fullscreen button - placed properly like in sample */
+.age-analytics-page .fullscreen-btn {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.age-analytics-page .fullscreen-btn:hover {
+  background: var(--surface-light);
+  color: var(--text);
+}
+
+/* Fullscreen Styles */
+.age-analytics-page .fullscreen-chart-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.age-analytics-page .fullscreen-chart-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+}
+
+.age-analytics-page .fullscreen-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-dark);
+  flex-shrink: 0;
+}
+
+.age-analytics-page .fullscreen-chart-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text);
+}
+
+.age-analytics-page .fullscreen-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.age-analytics-page .close-fullscreen {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.age-analytics-page .close-fullscreen:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.age-analytics-page .fullscreen-chart-content {
+  flex: 1;
+  padding: 1.5rem;
+  height: calc(100% - 80px);
+}
+
+/* Blur effect when fullscreen is active */
+.age-analytics-page .charts-grid.blurred {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Empty state adjustments */
+.age-analytics-page .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 1rem;
+  text-align: center;
+  color: var(--text-light);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .age-analytics-page .charts-top-row {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: auto;
+    gap: 2rem;
+  }
+  
+  .age-analytics-page .charts-top-row .chart-card {
+    height: 400px;
+  }
+  
+  .age-analytics-page .charts-bottom-row {
+    height: 400px;
+    margin-top: 2rem;
+  }
+  
+  .age-analytics-page .centered-trend-chart {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .age-analytics-page .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .age-analytics-page .chart-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .age-analytics-page .chart-filters-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+  }
+  
+  .age-analytics-page .chart-filter {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .age-analytics-page .chart-filter select,
+  .age-analytics-page .chart-filter input {
+    flex: 1;
+    max-width: 150px;
+  }
+  
+  .age-analytics-page .fullscreen-chart-overlay {
+    padding: 1rem;
+  }
+  
+  .age-analytics-page .fullscreen-chart-header {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .age-analytics-page .fullscreen-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .age-analytics-page .charts-top-row,
+  .age-analytics-page .charts-bottom-row {
+    height: auto;
+    min-height: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .age-analytics-page .fullscreen-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .age-analytics-page .range-inputs input {
+    width: 60px;
+  }
+  
+  .age-analytics-page .charts-top-row .chart-card,
+  .age-analytics-page .charts-bottom-row .chart-card {
+    height: 300px;
+  }
+}

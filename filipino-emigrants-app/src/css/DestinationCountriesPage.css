@@ -1,0 +1,411 @@
+/* DestinationCountriesPage.css - Matches Dashboard styling with side-by-side layout */
+.destination-countries-page {
+  padding: 1.25rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+/* Page Header */
+.destination-countries-page .page-header {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.destination-countries-page .page-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.destination-countries-page .page-header p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Charts Grid - Side by side layout */
+.destination-countries-page .charts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.destination-countries-page .side-by-side-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.destination-countries-page .charts-grid.blurred {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.destination-countries-page .chart-card.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Chart Cards - Uniform sizing */
+.destination-countries-page .chart-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+  width: 100%;
+}
+
+.destination-countries-page .chart-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Chart Header */
+.destination-countries-page .chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
+  gap: 1rem;
+}
+
+.destination-countries-page .chart-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.destination-countries-page .chart-icon {
+  color: var(--primary);
+  font-size: 1.1rem;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.destination-countries-page .chart-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.destination-countries-page .chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Chart Filter Styles - Matches Dashboard */
+.destination-countries-page .chart-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.destination-countries-page .chart-filter label {
+  color: var(--text-light);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.destination-countries-page .chart-filter select,
+.destination-countries-page .chart-filter input {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-light);
+  color: var(--text);
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.destination-countries-page .chart-filter select:focus,
+.destination-countries-page .chart-filter input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.destination-countries-page .chart-filters-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.destination-countries-page .range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.destination-countries-page .range-inputs input {
+  width: 70px;
+  text-align: center;
+}
+
+.destination-countries-page .range-inputs span {
+  color: var(--text-light);
+  font-size: 0.75rem;
+}
+
+/* Fullscreen Button - Matches Dashboard */
+.destination-countries-page .fullscreen-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.destination-countries-page .fullscreen-btn:hover {
+  background: var(--surface-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Chart Content */
+.destination-countries-page .chart-content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.destination-countries-page .no-data-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-light);
+  font-size: 0.95rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius);
+  border: 1px dashed var(--border-light);
+}
+
+/* Empty State */
+.destination-countries-page .empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.destination-countries-page .empty-state h3 {
+  color: var(--text);
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.destination-countries-page .empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+/* Fullscreen Overlay - Matches Dashboard */
+.destination-countries-page .fullscreen-chart-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  backdrop-filter: blur(8px);
+}
+
+.destination-countries-page .fullscreen-chart-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  width: 95vw;
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
+  position: relative;
+}
+
+.destination-countries-page .fullscreen-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.destination-countries-page .fullscreen-chart-header h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.destination-countries-page .close-fullscreen {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.destination-countries-page .close-fullscreen:hover {
+  background: #DC2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.destination-countries-page .fullscreen-chart-content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .destination-countries-page .side-by-side-charts {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .destination-countries-page {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .destination-countries-page .side-by-side-charts {
+    grid-template-columns: 1fr;
+  }
+  
+  .destination-countries-page .chart-card {
+    height: 350px;
+  }
+  
+  .destination-countries-page .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .destination-countries-page .chart-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .destination-countries-page .fullscreen-chart-overlay {
+    padding: 1rem;
+  }
+  
+  .destination-countries-page .fullscreen-chart-container {
+    padding: 1rem;
+  }
+  
+  .destination-countries-page .fullscreen-chart-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .destination-countries-page .fullscreen-chart-header h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .destination-countries-page {
+    padding: 0.75rem;
+  }
+  
+  .destination-countries-page .chart-card {
+    padding: 1rem;
+    height: 300px;
+  }
+  
+  .destination-countries-page .chart-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .destination-countries-page .range-inputs {
+    flex-direction: row;
+  }
+  
+  .destination-countries-page .range-inputs input {
+    width: 60px;
+  }
+}
+
+/* Animation for chart transitions */
+.destination-countries-page .chart-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
