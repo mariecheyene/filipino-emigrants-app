@@ -1,0 +1,90 @@
+{
+  "summary": {
+    "totalEmigrants": 15000,
+    "maleCount": 8200,
+    "femaleCount": 6800,
+    "averageAge": 34,
+    "uniqueCountries": 45,
+    "topDestination": "United States",
+    "topOrigin": "Metro Manila",
+    "lastUpdated": "2024-01-15T00:00:00.000Z"
+  },
+  "emigrants": [
+    {
+      "id": "sample-1",
+      "firstName": "Juan",
+      "lastName": "Dela Cruz",
+      "age": 32,
+      "gender": "Male",
+      "civilStatus": "Married",
+      "educationLevel": "College",
+      "occupation": "Engineer",
+      "countryOfDestination": "United States",
+      "yearOfEmigration": 2020,
+      "reasonForEmigration": "Employment",
+      "provinceOfOrigin": "Manila",
+      "regionOfOrigin": "NCR"
+    },
+    {
+      "id": "sample-2",
+      "firstName": "Maria",
+      "lastName": "Santos",
+      "age": 28,
+      "gender": "Female",
+      "civilStatus": "Single",
+      "educationLevel": "College",
+      "occupation": "Nurse",
+      "countryOfDestination": "United Kingdom",
+      "yearOfEmigration": 2019,
+      "reasonForEmigration": "Employment",
+      "provinceOfOrigin": "Cebu",
+      "regionOfOrigin": "Region VII"
+    }
+  ],
+  "civilStatus": [
+    { "year": 2020, "Single": 4500, "Married": 9800, "Widowed": 450, "Divorced": 250 },
+    { "year": 2019, "Single": 4200, "Married": 9200, "Widowed": 420, "Divorced": 230 }
+  ],
+  "sexData": [
+    { "year": 2020, "Male": 5200, "Female": 4300 },
+    { "year": 2019, "Male": 4800, "Female": 4100 }
+  ],
+  "ageData": [
+    { "ageGroup": "18-25", "count": 2800 },
+    { "ageGroup": "26-35", "count": 6200 },
+    { "ageGroup": "36-45", "count": 3800 },
+    { "ageGroup": "46-55", "count": 1800 },
+    { "ageGroup": "56+", "count": 400 }
+  ],
+  "educationData": [
+    { "year": 2020, "Elementary": 800, "High School": 4200, "College": 8800, "Postgraduate": 1200 },
+    { "year": 2019, "Elementary": 750, "High School": 4000, "College": 8500, "Postgraduate": 1100 }
+  ],
+  "occupationData": [
+    { "year": 2020, "Domestic Worker": 3200, "Nurse": 2800, "Engineer": 2200, "Seafarer": 1800, "IT Professional": 1500 },
+    { "year": 2019, "Domestic Worker": 3000, "Nurse": 2600, "Engineer": 2000, "Seafarer": 1700, "IT Professional": 1300 }
+  ],
+  "placeOfOrigin": [
+    { "region": "NCR", "count": 4200 },
+    { "region": "Region IV-A", "count": 3800 },
+    { "region": "Region III", "count": 2800 },
+    { "region": "Region VII", "count": 2200 },
+    { "region": "Region XI", "count": 1800 }
+  ],
+  "allCountries": [
+    { "country": "United States", "count": 4200 },
+    { "country": "Saudi Arabia", "count": 3800 },
+    { "country": "United Arab Emirates", "count": 2800 },
+    { "country": "United Kingdom", "count": 1800 },
+    { "country": "Canada", "count": 1500 },
+    { "country": "Japan", "count": 1200 },
+    { "country": "Australia", "count": 900 },
+    { "country": "Singapore", "count": 800 }
+  ],
+  "majorCountries": [
+    { "country": "United States", "count": 4200, "percentage": 28 },
+    { "country": "Saudi Arabia", "count": 3800, "percentage": 25 },
+    { "country": "United Arab Emirates", "count": 2800, "percentage": 19 },
+    { "country": "Other Countries", "count": 4200, "percentage": 28 }
+  ]
+}
