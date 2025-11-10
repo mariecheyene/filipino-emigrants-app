@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { 
   FiMenu, FiShield, FiRefreshCw, FiHome, FiUsers, 
   FiUser, FiCalendar, FiBook, FiBriefcase, FiMapPin, 
-  FiMap, FiGlobe, FiActivity, FiUpload 
+  FiMap, FiGlobe, FiActivity, FiUpload, FiDatabase 
 } from 'react-icons/fi';
 
 // Import all pages
@@ -17,6 +17,7 @@ import ProvinceOriginPage from './pages/ProvinceOriginPage';
 import DestinationCountriesPage from './pages/DestinationCountriesPage';
 import ComparisonsPage from './pages/ComparisonsPage';
 import CsvUploadPage from './pages/CsvUploadPage';
+import EmigrantsRecords from './pages/EmigrantsRecords';
 
 // Import your emigrantsService directly
 import { 
@@ -131,6 +132,7 @@ function App() {
     { id: 'destination-countries', label: 'Destination Countries', icon: <FiGlobe /> },
     { id: 'comparisons', label: 'Comparisons & Relationships', icon: <FiActivity /> },
     { id: 'csv-upload', label: 'Data Uploads', icon: <FiUpload /> },
+    { id: 'emigrant-records', label: 'Emigrant Records', icon: <FiDatabase /> }, // Moved to bottom
   ];
 
   const dataTypes = [
@@ -194,6 +196,8 @@ function App() {
         return <ComparisonsPage {...commonProps} />;
       case 'csv-upload':
         return <CsvUploadPage {...commonProps} />;
+      case 'emigrant-records':
+        return <EmigrantsRecords {...commonProps} />;
       default:
         return <DashboardPage {...commonProps} />;
     }

@@ -12,16 +12,23 @@
     "vite": "^7.1.2"
   },
   "dependencies": {
+    "@react-leaflet/core": "^3.0.0",
     "chart.js": "^4.5.1",
     "chartjs-chart-geo": "^4.3.6",
+    "d3-scale": "^4.0.2",
     "firebase": "^12.2.1",
+    "leaflet": "^1.9.4",
     "papaparse": "^5.5.3",
+    "prop-types": "^15.8.1",
     "react": "^19.1.1",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.1.1",
     "react-firebase-hooks": "^5.1.1",
     "react-icons": "^5.5.0",
+    "react-leaflet": "^5.0.0",
+    "react-simple-maps": "^3.0.0",
     "recharts": "^3.3.0",
+    "topojson-client": "^3.1.0",
     "xlsx": "^0.18.5"
   }
 }

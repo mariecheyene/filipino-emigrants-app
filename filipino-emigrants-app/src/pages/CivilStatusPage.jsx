@@ -12,41 +12,72 @@ import {
 import { getAllData, getReadStats, resetSession } from '../services/emigrantsService';
 import '../css/CivilStatusPage.css';
 
+// Custom Tooltip Component for better clarity
+const CivilStatusTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="civil-status-tooltip">
+        <p className="civil-status-tooltip-label">{`Year: ${label}`}</p>
+        {payload.map((entry, index) => (
+          <p key={index} className="civil-status-tooltip-item">
+            <span 
+              className="civil-status-tooltip-color" 
+              style={{ backgroundColor: entry.color }}
+            ></span>
+            {`${entry.name}: ${entry.value?.toLocaleString() || '0'} people`}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
+// Custom Pie Chart Label Component to handle small percentages
+const CustomPieLabel = ({
+  cx, cy, midAngle, innerRadius, outerRadius, percent, index, name
+}) => {
+  if (percent < 0.03) {
+    return null;
+  }
+
+  const RADIAN = Math.PI / 180;
+  const radius = outerRadius + 20;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text 
+      x={x} 
+      y={y} 
+      fill="#374151"
+      textAnchor={x > cx ? 'start' : 'end'} 
+      dominantBaseline="central"
+      fontSize={12}
+      fontWeight="600"
+    >
+      {`${(percent * 100).toFixed(1)}%`}
+    </text>
+  );
+};
+
+// SIMPLE FIXED SCALING - START AT 50,000 AND GO UP
+const useFixedYAxisDomain = () => {
+  return [50000, 'auto']; // START AT 50,000 AND AUTO-SCALE UP
+};
+
 // Individual Chart Components with React.memo
 const TrendsChart = React.memo(({ data, yearRange, civilStatusTypes, onYearRangeChange, onCivilStatusTypesChange, onFullscreen }) => {
   const chartData = useMemo(() => {
     if (!data?.civilStatus?.length) return [];
 
-    const civilStatusByYear = {};
-    
-    data.civilStatus.forEach((item) => {
-      const year = item.YEAR || item.year;
-      if (!year) return;
-      
-      if (!civilStatusByYear[year]) {
-        civilStatusByYear[year] = { 
-          year, 
-          single: 0, 
-          married: 0, 
-          widowed: 0,
-          separated: 0, 
-          divorced: 0, 
-          notReported: 0 
-        };
-      }
-      
-      civilStatusByYear[year].single += Number(item.Single) || 0;
-      civilStatusByYear[year].married += Number(item.Married) || 0;
-      civilStatusByYear[year].widowed += Number(item.Widower) || 0;
-      civilStatusByYear[year].separated += Number(item.Separated) || 0;
-      civilStatusByYear[year].divorced += Number(item.Divorced) || 0;
-      civilStatusByYear[year].notReported += Number(item['Not Reported']) || 0;
-    });
-
-    return Object.values(civilStatusByYear)
-      .sort((a, b) => a.year - b.year)
-      .filter(item => item.year >= yearRange[0] && item.year <= yearRange[1]);
+    return data.civilStatus
+      .filter(item => item.year >= yearRange[0] && item.year <= yearRange[1])
+      .sort((a, b) => a.year - b.year);
   }, [data, yearRange]);
+
+  // FIXED: START AT 50,000
+  const yAxisDomain = useFixedYAxisDomain();
 
   const COLORS = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#7ED321', '#B8E986'];
 
@@ -80,7 +111,7 @@ const TrendsChart = React.memo(({ data, yearRange, civilStatusTypes, onYearRange
         {[
           { key: 'single', label: 'Single' },
           { key: 'married', label: 'Married' },
-          { key: 'widowed', label: 'Widowed' },
+          { key: 'widower', label: 'Widower' },
           { key: 'separated', label: 'Separated' },
           { key: 'divorced', label: 'Divorced' },
           { key: 'notReported', label: 'Not Reported' }
@@ -128,8 +159,8 @@ const TrendsChart = React.memo(({ data, yearRange, civilStatusTypes, onYearRange
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="year" />
-              <YAxis />
-              <Tooltip formatter={(value) => [value.toLocaleString(), 'Count']} />
+              <YAxis domain={yAxisDomain} tickFormatter={(value) => value.toLocaleString()} />
+              <Tooltip content={<CivilStatusTooltip />} />
               <Legend />
               {civilStatusTypes.includes('single') && (
                 <Line 
@@ -137,7 +168,7 @@ const TrendsChart = React.memo(({ data, yearRange, civilStatusTypes, onYearRange
                   dataKey="single" 
                   stroke={COLORS[0]} 
                   strokeWidth={2}
-                  dot={{ fill: COLORS[0] }}
+                  dot={{ fill: COLORS[0], r: 4 }}
                   name="Single" 
                 />
               )}
@@ -147,18 +178,18 @@ const TrendsChart = React.memo(({ data, yearRange, civilStatusTypes, onYearRange
                   dataKey="married" 
                   stroke={COLORS[1]} 
                   strokeWidth={2}
-                  dot={{ fill: COLORS[1] }}
+                  dot={{ fill: COLORS[1], r: 4 }}
                   name="Married" 
                 />
               )}
-              {civilStatusTypes.includes('widowed') && (
+              {civilStatusTypes.includes('widower') && (
                 <Line 
                   type="monotone" 
-                  dataKey="widowed" 
+                  dataKey="widower" 
                   stroke={COLORS[2]} 
                   strokeWidth={2}
-                  dot={{ fill: COLORS[2] }}
-                  name="Widowed" 
+                  dot={{ fill: COLORS[2], r: 4 }}
+                  name="Widower" 
                 />
               )}
               {civilStatusTypes.includes('separated') && (
@@ -167,7 +198,7 @@ const TrendsChart = React.memo(({ data, yearRange, civilStatusTypes, onYearRange
                   dataKey="separated" 
                   stroke={COLORS[3]} 
                   strokeWidth={2}
-                  dot={{ fill: COLORS[3] }}
+                  dot={{ fill: COLORS[3], r: 4 }}
                   name="Separated" 
                 />
               )}
@@ -177,7 +208,7 @@ const TrendsChart = React.memo(({ data, yearRange, civilStatusTypes, onYearRange
                   dataKey="divorced" 
                   stroke={COLORS[4]} 
                   strokeWidth={2}
-                  dot={{ fill: COLORS[4] }}
+                  dot={{ fill: COLORS[4], r: 4 }}
                   name="Divorced" 
                 />
               )}
@@ -187,7 +218,7 @@ const TrendsChart = React.memo(({ data, yearRange, civilStatusTypes, onYearRange
                   dataKey="notReported" 
                   stroke={COLORS[5]} 
                   strokeWidth={2}
-                  dot={{ fill: COLORS[5] }}
+                  dot={{ fill: COLORS[5], r: 4 }}
                   name="Not Reported" 
                 />
               )}
@@ -207,34 +238,13 @@ const DistributionChart = React.memo(({ data, yearRange, onYearRangeChange, onFu
   const chartData = useMemo(() => {
     if (!data?.civilStatus?.length) return [];
 
-    const civilStatusByYear = {};
-    
-    data.civilStatus.forEach(item => {
-      const year = item.YEAR || item.year;
-      if (!civilStatusByYear[year]) {
-        civilStatusByYear[year] = { 
-          year, 
-          single: 0, 
-          married: 0, 
-          widowed: 0,
-          separated: 0, 
-          divorced: 0, 
-          notReported: 0 
-        };
-      }
-      
-      civilStatusByYear[year].single += Number(item.Single) || 0;
-      civilStatusByYear[year].married += Number(item.Married) || 0;
-      civilStatusByYear[year].widowed += Number(item.Widower) || 0;
-      civilStatusByYear[year].separated += Number(item.Separated) || 0;
-      civilStatusByYear[year].divorced += Number(item.Divorced) || 0;
-      civilStatusByYear[year].notReported += Number(item['Not Reported']) || 0;
-    });
-
-    return Object.values(civilStatusByYear)
-      .sort((a, b) => a.year - b.year)
-      .filter(item => item.year >= yearRange[0] && item.year <= yearRange[1]);
+    return data.civilStatus
+      .filter(item => item.year >= yearRange[0] && item.year <= yearRange[1])
+      .sort((a, b) => a.year - b.year);
   }, [data, yearRange]);
+
+  // FIXED: START AT 50,000
+  const yAxisDomain = useFixedYAxisDomain();
 
   const COLORS = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#7ED321', '#B8E986'];
 
@@ -285,12 +295,12 @@ const DistributionChart = React.memo(({ data, yearRange, onYearRangeChange, onFu
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="year" />
-              <YAxis />
-              <Tooltip formatter={(value) => [value.toLocaleString(), 'Count']} />
+              <YAxis domain={yAxisDomain} tickFormatter={(value) => value.toLocaleString()} />
+              <Tooltip content={<CivilStatusTooltip />} />
               <Legend />
               <Bar dataKey="single" stackId="a" fill={COLORS[0]} name="Single" />
               <Bar dataKey="married" stackId="a" fill={COLORS[1]} name="Married" />
-              <Bar dataKey="widowed" stackId="a" fill={COLORS[2]} name="Widowed" />
+              <Bar dataKey="widower" stackId="a" fill={COLORS[2]} name="Widower" />
               <Bar dataKey="separated" stackId="a" fill={COLORS[3]} name="Separated" />
               <Bar dataKey="divorced" stackId="a" fill={COLORS[4]} name="Divorced" />
               <Bar dataKey="notReported" stackId="a" fill={COLORS[5]} name="Not Reported" />
@@ -310,49 +320,43 @@ const CompositionChart = React.memo(({ data, selectedYear, onYearChange, onFulls
   const chartData = useMemo(() => {
     if (!data?.civilStatus?.length) return [];
 
-    let filteredData = [];
-    
-    if (selectedYear === 'all') {
-      filteredData = data.civilStatus;
-    } else {
-      // FIXED: Use uppercase YEAR field from your data
-      filteredData = data.civilStatus.filter(item => {
-        const itemYear = item.YEAR || item.year;
-        return itemYear === selectedYear;
-      });
-    }
+    let filteredData = selectedYear === 'all' 
+      ? data.civilStatus 
+      : data.civilStatus.filter(item => item.year === selectedYear);
 
     if (!filteredData.length) return [];
     
     const totals = { 
-      single: 0, married: 0, widowed: 0, separated: 0, divorced: 0, notReported: 0 
+      single: 0, married: 0, widower: 0, separated: 0, divorced: 0, notReported: 0 
     };
     
     filteredData.forEach(item => {
-      totals.single += Number(item.Single) || 0;
-      totals.married += Number(item.Married) || 0;
-      totals.widowed += Number(item.Widower) || 0;
-      totals.separated += Number(item.Separated) || 0;
-      totals.divorced += Number(item.Divorced) || 0;
-      totals.notReported += Number(item['Not Reported']) || 0;
+      totals.single += Number(item.single) || 0;
+      totals.married += Number(item.married) || 0;
+      totals.widower += Number(item.widower) || 0;
+      totals.separated += Number(item.separated) || 0;
+      totals.divorced += Number(item.divorced) || 0;
+      totals.notReported += Number(item.notReported) || 0;
     });
 
+    const totalSum = Object.values(totals).reduce((sum, value) => sum + value, 0);
+    
     const result = Object.entries(totals)
       .filter(([key, value]) => value > 0)
       .map(([key, value]) => ({ 
-        name: key === 'widowed' ? 'Widowed' : 
+        name: key === 'widower' ? 'Widower' : 
               key === 'notReported' ? 'Not Reported' :
               key.charAt(0).toUpperCase() + key.slice(1), 
-        value 
+        value,
+        percentage: totalSum > 0 ? (value / totalSum * 100).toFixed(1) : 0
       }));
 
-    return result;
+    return result.sort((a, b) => b.value - a.value);
   }, [data, selectedYear]);
 
-  // Get available years from data
   const availableYears = useMemo(() => {
     if (!data?.civilStatus?.length) return [];
-    return [...new Set(data.civilStatus.map(item => item.YEAR || item.year))].sort();
+    return [...new Set(data.civilStatus.map(item => item.year))].sort();
   }, [data]);
 
   const yearOptions = [
@@ -381,8 +385,24 @@ const CompositionChart = React.memo(({ data, selectedYear, onYearChange, onFulls
     </div>
   );
 
+  const CustomPieLegend = () => (
+    <div className="civil-status-pie-legend">
+      {chartData.map((entry, index) => (
+        <div key={`legend-${index}`} className="civil-status-legend-item">
+          <div 
+            className="civil-status-legend-color" 
+            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+          ></div>
+          <span className="civil-status-legend-text">
+            {entry.name}: {entry.percentage}%
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
-    <div className="civil-status-chart-card civil-status-centered">
+    <div className="civil-status-chart-card civil-status-composition-card">
       <div className="civil-status-chart-header">
         <div className="civil-status-chart-title">
           <span className="civil-status-chart-icon"><FiPieChart /></span>
@@ -399,28 +419,46 @@ const CompositionChart = React.memo(({ data, selectedYear, onYearChange, onFulls
           </button>
         </div>
       </div>
-      <div className="civil-status-chart-content">
+      <div className="civil-status-chart-content civil-status-composition-content">
         {chartData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={chartData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value) => [value.toLocaleString(), 'Count']} />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="civil-status-pie-container">
+            <div className="civil-status-pie-chart-wrapper">
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={CustomPieLabel}
+                    outerRadius={100}
+                    innerRadius={50}
+                    fill="#8884d8"
+                    dataKey="value"
+                    paddingAngle={2}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={COLORS[index % COLORS.length]} 
+                        stroke="#fff"
+                        strokeWidth={2}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value, name) => [
+                      `${value?.toLocaleString() || '0'} people (${chartData.find(item => item.name === name)?.percentage || 0}%)`, 
+                      name
+                    ]} 
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="civil-status-legend-container">
+              <CustomPieLegend />
+            </div>
+          </div>
         ) : (
           <div className="civil-status-no-data">
             {selectedYear === 'all' 
@@ -433,7 +471,7 @@ const CompositionChart = React.memo(({ data, selectedYear, onYearChange, onFulls
   );
 });
 
-// Full Screen Component with React.memo
+// Full Screen Component
 const FullScreenChart = React.memo(({ title, children, onClose, isOpen }) => {
   if (!isOpen) return null;
 
@@ -454,41 +492,18 @@ const FullScreenChart = React.memo(({ title, children, onClose, isOpen }) => {
   );
 });
 
-// Full Screen Content Components with React.memo
+// Full Screen Content Components
 const FullScreenTrendsChart = React.memo(({ data, yearRange, civilStatusTypes }) => {
   const chartData = useMemo(() => {
     if (!data?.civilStatus?.length) return [];
 
-    const civilStatusByYear = {};
-    
-    data.civilStatus.forEach((item) => {
-      const year = item.YEAR || item.year;
-      if (!year) return;
-      
-      if (!civilStatusByYear[year]) {
-        civilStatusByYear[year] = { 
-          year, 
-          single: 0, 
-          married: 0, 
-          widowed: 0,
-          separated: 0, 
-          divorced: 0, 
-          notReported: 0 
-        };
-      }
-      
-      civilStatusByYear[year].single += Number(item.Single) || 0;
-      civilStatusByYear[year].married += Number(item.Married) || 0;
-      civilStatusByYear[year].widowed += Number(item.Widower) || 0;
-      civilStatusByYear[year].separated += Number(item.Separated) || 0;
-      civilStatusByYear[year].divorced += Number(item.Divorced) || 0;
-      civilStatusByYear[year].notReported += Number(item['Not Reported']) || 0;
-    });
-
-    return Object.values(civilStatusByYear)
-      .sort((a, b) => a.year - b.year)
-      .filter(item => item.year >= yearRange[0] && item.year <= yearRange[1]);
+    return data.civilStatus
+      .filter(item => item.year >= yearRange[0] && item.year <= yearRange[1])
+      .sort((a, b) => a.year - b.year);
   }, [data, yearRange]);
+
+  // FIXED: START AT 50,000
+  const yAxisDomain = useFixedYAxisDomain();
 
   const COLORS = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#7ED321', '#B8E986'];
 
@@ -497,8 +512,8 @@ const FullScreenTrendsChart = React.memo(({ data, yearRange, civilStatusTypes })
       <LineChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="year" />
-        <YAxis />
-        <Tooltip formatter={(value) => [value.toLocaleString(), 'Count']} />
+        <YAxis domain={yAxisDomain} tickFormatter={(value) => value.toLocaleString()} />
+        <Tooltip content={<CivilStatusTooltip />} />
         <Legend />
         {civilStatusTypes.includes('single') && (
           <Line 
@@ -506,7 +521,7 @@ const FullScreenTrendsChart = React.memo(({ data, yearRange, civilStatusTypes })
             dataKey="single" 
             stroke={COLORS[0]} 
             strokeWidth={3}
-            dot={{ fill: COLORS[0] }}
+            dot={{ fill: COLORS[0], r: 5 }}
             name="Single" 
           />
         )}
@@ -516,18 +531,18 @@ const FullScreenTrendsChart = React.memo(({ data, yearRange, civilStatusTypes })
             dataKey="married" 
             stroke={COLORS[1]} 
             strokeWidth={3}
-            dot={{ fill: COLORS[1] }}
+            dot={{ fill: COLORS[1], r: 5 }}
             name="Married" 
           />
         )}
-        {civilStatusTypes.includes('widowed') && (
+        {civilStatusTypes.includes('widower') && (
           <Line 
             type="monotone" 
-            dataKey="widowed" 
+            dataKey="widower" 
             stroke={COLORS[2]} 
             strokeWidth={3}
-            dot={{ fill: COLORS[2] }}
-            name="Widowed" 
+            dot={{ fill: COLORS[2], r: 5 }}
+            name="Widower" 
           />
         )}
         {civilStatusTypes.includes('separated') && (
@@ -536,7 +551,7 @@ const FullScreenTrendsChart = React.memo(({ data, yearRange, civilStatusTypes })
             dataKey="separated" 
             stroke={COLORS[3]} 
             strokeWidth={3}
-            dot={{ fill: COLORS[3] }}
+            dot={{ fill: COLORS[3], r: 5 }}
             name="Separated" 
           />
         )}
@@ -546,7 +561,7 @@ const FullScreenTrendsChart = React.memo(({ data, yearRange, civilStatusTypes })
             dataKey="divorced" 
             stroke={COLORS[4]} 
             strokeWidth={3}
-            dot={{ fill: COLORS[4] }}
+            dot={{ fill: COLORS[4], r: 5 }}
             name="Divorced" 
           />
         )}
@@ -556,7 +571,7 @@ const FullScreenTrendsChart = React.memo(({ data, yearRange, civilStatusTypes })
             dataKey="notReported" 
             stroke={COLORS[5]} 
             strokeWidth={3}
-            dot={{ fill: COLORS[5] }}
+            dot={{ fill: COLORS[5], r: 5 }}
             name="Not Reported" 
           />
         )}
@@ -571,59 +586,120 @@ const FullScreenCompositionChart = React.memo(({ data, selectedYear }) => {
 
     let filteredData = selectedYear === 'all' 
       ? data.civilStatus 
-      : data.civilStatus.filter(item => {
-          const itemYear = item.YEAR || item.year;
-          return itemYear === selectedYear;
-        });
+      : data.civilStatus.filter(item => item.year === selectedYear);
 
     if (!filteredData.length) return [];
     
     const totals = { 
-      single: 0, married: 0, widowed: 0, separated: 0, divorced: 0, notReported: 0 
+      single: 0, married: 0, widower: 0, separated: 0, divorced: 0, notReported: 0 
     };
     
     filteredData.forEach(item => {
-      totals.single += Number(item.Single) || 0;
-      totals.married += Number(item.Married) || 0;
-      totals.widowed += Number(item.Widower) || 0;
-      totals.separated += Number(item.Separated) || 0;
-      totals.divorced += Number(item.Divorced) || 0;
-      totals.notReported += Number(item['Not Reported']) || 0;
+      totals.single += Number(item.single) || 0;
+      totals.married += Number(item.married) || 0;
+      totals.widower += Number(item.widower) || 0;
+      totals.separated += Number(item.separated) || 0;
+      totals.divorced += Number(item.divorced) || 0;
+      totals.notReported += Number(item.notReported) || 0;
     });
+
+    const totalSum = Object.values(totals).reduce((sum, value) => sum + value, 0);
 
     return Object.entries(totals)
       .filter(([key, value]) => value > 0)
       .map(([key, value]) => ({ 
-        name: key === 'widowed' ? 'Widowed' : 
+        name: key === 'widower' ? 'Widower' : 
               key === 'notReported' ? 'Not Reported' :
               key.charAt(0).toUpperCase() + key.slice(1), 
-        value 
+        value,
+        percentage: totalSum > 0 ? (value / totalSum * 100).toFixed(1) : 0
       }));
   }, [data, selectedYear]);
 
   const COLORS = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#7ED321', '#B8E986'];
 
+  const FullScreenPieLabel = ({
+    cx, cy, midAngle, innerRadius, outerRadius, percent, index, name
+  }) => {
+    if (percent < 0.03) {
+      return null;
+    }
+
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius + 40;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="#374151"
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        fontSize={14}
+        fontWeight="600"
+      >
+        {`${(percent * 100).toFixed(1)}%`}
+      </text>
+    );
+  };
+
+  const FullScreenPieLegend = () => (
+    <div className="civil-status-pie-legend civil-status-fullscreen-legend">
+      {chartData.map((entry, index) => (
+        <div key={`item-${index}`} className="civil-status-legend-item">
+          <div 
+            className="civil-status-legend-color" 
+            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+          ></div>
+          <span className="civil-status-legend-text">
+            {entry.name}: {entry.percentage}%
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
-    <ResponsiveContainer width="100%" height="90%">
-      <PieChart>
-        <Pie
-          data={chartData}
-          cx="50%"
-          cy="50%"
-          labelLine={false}
-          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
-          outerRadius={120}
-          fill="#8884d8"
-          dataKey="value"
-        >
-          {chartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Pie>
-        <Tooltip formatter={(value) => [value.toLocaleString(), 'Count']} />
-        <Legend />
-      </PieChart>
-    </ResponsiveContainer>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, minHeight: 0, padding: '30px' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={FullScreenPieLabel}
+              outerRadius={140}
+              innerRadius={60}
+              fill="#8884d8"
+              dataKey="value"
+              paddingAngle={2}
+            >
+              {chartData.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={COLORS[index % COLORS.length]} 
+                  stroke="#fff"
+                  strokeWidth={2}
+                />
+              ))}
+            </Pie>
+            <Tooltip 
+              formatter={(value, name) => [
+                `${value?.toLocaleString() || '0'} people (${chartData.find(item => item.name === name)?.percentage || 0}%)`, 
+                name
+              ]} 
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="civil-status-legend-container civil-status-fullscreen-legend-container">
+        <FullScreenPieLegend />
+      </div>
+    </div>
   );
 });
 
@@ -631,34 +707,13 @@ const FullScreenDistributionChart = React.memo(({ data, yearRange }) => {
   const chartData = useMemo(() => {
     if (!data?.civilStatus?.length) return [];
 
-    const civilStatusByYear = {};
-    
-    data.civilStatus.forEach(item => {
-      const year = item.YEAR || item.year;
-      if (!civilStatusByYear[year]) {
-        civilStatusByYear[year] = { 
-          year, 
-          single: 0, 
-          married: 0, 
-          widowed: 0,
-          separated: 0, 
-          divorced: 0, 
-          notReported: 0 
-        };
-      }
-      
-      civilStatusByYear[year].single += Number(item.Single) || 0;
-      civilStatusByYear[year].married += Number(item.Married) || 0;
-      civilStatusByYear[year].widowed += Number(item.Widower) || 0;
-      civilStatusByYear[year].separated += Number(item.Separated) || 0;
-      civilStatusByYear[year].divorced += Number(item.Divorced) || 0;
-      civilStatusByYear[year].notReported += Number(item['Not Reported']) || 0;
-    });
-
-    return Object.values(civilStatusByYear)
-      .sort((a, b) => a.year - b.year)
-      .filter(item => item.year >= yearRange[0] && item.year <= yearRange[1]);
+    return data.civilStatus
+      .filter(item => item.year >= yearRange[0] && item.year <= yearRange[1])
+      .sort((a, b) => a.year - b.year);
   }, [data, yearRange]);
+
+  // FIXED: START AT 50,000
+  const yAxisDomain = useFixedYAxisDomain();
 
   const COLORS = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#7ED321', '#B8E986'];
 
@@ -667,12 +722,12 @@ const FullScreenDistributionChart = React.memo(({ data, yearRange }) => {
       <BarChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="year" />
-        <YAxis />
-        <Tooltip formatter={(value) => [value.toLocaleString(), 'Count']} />
+        <YAxis domain={yAxisDomain} tickFormatter={(value) => value.toLocaleString()} />
+        <Tooltip content={<CivilStatusTooltip />} />
         <Legend />
         <Bar dataKey="single" stackId="a" fill={COLORS[0]} name="Single" />
         <Bar dataKey="married" stackId="a" fill={COLORS[1]} name="Married" />
-        <Bar dataKey="widowed" stackId="a" fill={COLORS[2]} name="Widowed" />
+        <Bar dataKey="widower" stackId="a" fill={COLORS[2]} name="Widower" />
         <Bar dataKey="separated" stackId="a" fill={COLORS[3]} name="Separated" />
         <Bar dataKey="divorced" stackId="a" fill={COLORS[4]} name="Divorced" />
         <Bar dataKey="notReported" stackId="a" fill={COLORS[5]} name="Not Reported" />
@@ -681,7 +736,7 @@ const FullScreenDistributionChart = React.memo(({ data, yearRange }) => {
   );
 });
 
-// Main Component with React.memo
+// Main Component
 const CivilStatusPage = () => {
   const [rawData, setRawData] = useState({ civilStatus: [] });
   const [loading, setLoading] = useState(true);
@@ -689,11 +744,10 @@ const CivilStatusPage = () => {
   const [readStats, setReadStats] = useState({ current: 0, max: 0, remaining: 0 });
   const [fullScreenChart, setFullScreenChart] = useState(null);
 
-  // Individual chart filters
   const [chartFilters, setChartFilters] = useState({
     trends: { 
       yearRange: [1981, 2020],
-      civilStatusTypes: ['single', 'married', 'widowed', 'separated', 'divorced', 'notReported']
+      civilStatusTypes: ['single', 'married', 'widower', 'separated', 'divorced', 'notReported']
     },
     composition: { year: 'all' },
     distribution: { yearRange: [1981, 2020] }
@@ -731,7 +785,6 @@ const CivilStatusPage = () => {
     fetchData();
   };
 
-  // Individual chart filter handlers
   const updateTrendsYearRange = (yearRange) => {
     setChartFilters(prev => ({
       ...prev,
@@ -834,7 +887,6 @@ const CivilStatusPage = () => {
 
   return (
     <div className="civil-status-container">
-      {/* Header */}
       <div className="civil-status-header">
         <div className="civil-status-header-content">
           <h2><FiUser /> Civil Status Analytics</h2>
@@ -854,7 +906,6 @@ const CivilStatusPage = () => {
 
       {hasData ? (
         <>
-          {/* Full Screen Chart Overlay */}
           <FullScreenChart 
             title={fullScreenChart}
             onClose={() => setFullScreenChart(null)}
@@ -863,7 +914,6 @@ const CivilStatusPage = () => {
             {renderFullScreenContent()}
           </FullScreenChart>
 
-          {/* Charts Grid - Composition moved to bottom */}
           <div className={`civil-status-charts-grid ${fullScreenChart ? 'blurred' : ''}`}>
             <TrendsChart 
               data={rawData}
@@ -881,7 +931,6 @@ const CivilStatusPage = () => {
               onFullscreen={() => handleFullscreenToggle("Civil Status Distribution by Year")}
             />
             
-            {/* Composition chart at the bottom */}
             <CompositionChart 
               data={rawData}
               selectedYear={chartFilters.composition.year}

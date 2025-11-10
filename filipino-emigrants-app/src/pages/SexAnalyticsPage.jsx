@@ -8,6 +8,7 @@ import {
   XAxis, YAxis, Tooltip, Legend, CartesianGrid, 
   ResponsiveContainer, Cell 
 } from 'recharts';
+import "../css/sex-analytics.css";
 
 const SexAnalyticsPage = ({ 
   filters, 
@@ -95,7 +96,7 @@ const SexAnalyticsPage = ({
 
   // Full Screen Components
   const FullScreenChart = ({ title, children, onClose }) => (
-    <div className="fullscreen-chart-overlay">
+    <div className="sex-analytics-page fullscreen-chart-overlay">
       <div className="fullscreen-chart-container">
         <div className="fullscreen-chart-header">
           <h3>{title}</h3>
@@ -284,10 +285,12 @@ const SexAnalyticsPage = ({
   };
 
   return (
-    <div className="data-page sex-analytics-page">
-      <div className="page-header">
-        <h2><FiUsers /> Sex Analytics</h2>
-        <p>Analyze gender-based migration patterns and trends</p>
+    <div className="sex-analytics-page">
+      <div className="page-header-section">
+        <div className="page-header">
+          <h2><FiUsers /> Sex Analytics</h2>
+          <p>Analyze gender-based migration patterns and trends</p>
+        </div>
       </div>
 
       {/* Full Screen Charts */}
@@ -309,107 +312,111 @@ const SexAnalyticsPage = ({
         </FullScreenChart>
       )}
 
-      {hasData ? (
-        <div className={`charts-grid two-column-layout ${fullScreenChart ? 'blurred' : ''}`}>
-          {/* LINE CHART - Independent processing */}
-          <ChartContainer 
-            title="Male vs Female Trend Over Time" 
-            icon={<FiTrendingUp />}
-            filters={
-              <div className="chart-filters-row">
-                <YearRangeFilter 
-                  value={filters.yearRange}
-                  onChange={(range) => handleFilterChange('yearRange', range)}
-                />
-                <GenderDisplayFilter 
-                  value={filters.selectedGender}
-                  onChange={(gender) => handleFilterChange('selectedGender', gender)}
-                />
-              </div>
-            }
-            onFullscreen={() => handleFullscreenToggle("Male vs Female Trend Over Time")}
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={lineChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis 
-                  dataKey="year" 
-                  stroke="#94A3B8"
-                  fontSize={12}
-                />
-                <YAxis 
-                  stroke="#94A3B8"
-                  fontSize={12}
-                  tickFormatter={(value) => value.toLocaleString()}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                {(filters.selectedGender === 'all' || filters.selectedGender === 'male') && (
-                  <Line 
-                    type="monotone" 
-                    dataKey="male" 
-                    stroke={GENDER_COLORS[0]} 
-                    strokeWidth={2}
-                    dot={false}
-                    name="Male"
+     
+          {hasData ? (
+  <div className="charts-container">
+    <div className="charts-grid"> {/* REMOVED: two-column-layout class */}
+      {/* LINE CHART */}
+      <ChartContainer 
+        title="Male vs Female Trend Over Time" 
+        icon={<FiTrendingUp />}
+        filters={
+          <div className="chart-filters-row">
+            <YearRangeFilter 
+              value={filters.yearRange}
+              onChange={(range) => handleFilterChange('yearRange', range)}
+            />
+            <GenderDisplayFilter 
+              value={filters.selectedGender}
+              onChange={(gender) => handleFilterChange('selectedGender', gender)}
+            />
+          </div>
+        }
+        onFullscreen={() => handleFullscreenToggle("Male vs Female Trend Over Time")}
+      >
+        <ResponsiveContainer width="100%" height="100%"> {/* CHANGED: height to 100% */}
+          <LineChart data={lineChartData}>
+             
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <XAxis 
+                    dataKey="year" 
+                    stroke="#94A3B8"
+                    fontSize={12}
                   />
-                )}
-                {(filters.selectedGender === 'all' || filters.selectedGender === 'female') && (
-                  <Line 
-                    type="monotone" 
-                    dataKey="female" 
-                    stroke={GENDER_COLORS[1]} 
-                    strokeWidth={2}
-                    dot={false}
-                    name="Female"
+                  <YAxis 
+                    stroke="#94A3B8"
+                    fontSize={12}
+                    tickFormatter={(value) => value.toLocaleString()}
                   />
-                )}
-              </LineChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-
-          {/* PIE CHART - FIXED: Now shows data by default with "All Years" */}
-          <ChartContainer 
-            title="Gender Composition" 
-            icon={<FiPieChart />}
-            filters={
-              <div className="chart-filters-row">
-                <YearDropdownFilter 
-                  value={currentGenderYear}
-                  onChange={(year) => handleFilterChange('genderYear', year)}
-                  label="Select Year"
-                />
-              </div>
-            }
-            onFullscreen={() => handleFullscreenToggle("Gender Composition")}
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={pieChartData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={2}
-                  dataKey="value"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
-                  labelLine={false}
-                >
-                  {pieChartData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={GENDER_COLORS[index % GENDER_COLORS.length]} 
-                      stroke="#1E293B"
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  {(filters.selectedGender === 'all' || filters.selectedGender === 'male') && (
+                    <Line 
+                      type="monotone" 
+                      dataKey="male" 
+                      stroke={GENDER_COLORS[0]} 
                       strokeWidth={2}
+                      dot={false}
+                      name="Male"
                     />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => [value?.toLocaleString() || 0, 'Count']} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartContainer>
+                  )}
+                  {(filters.selectedGender === 'all' || filters.selectedGender === 'female') && (
+                    <Line 
+                      type="monotone" 
+                      dataKey="female" 
+                      stroke={GENDER_COLORS[1]} 
+                      strokeWidth={2}
+                      dot={false}
+                      name="Female"
+                    />
+                  )}
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+
+           {/* PIE CHART */}
+      <ChartContainer 
+        title="Gender Composition" 
+        icon={<FiPieChart />}
+        filters={
+          <div className="chart-filters-row">
+            <YearDropdownFilter 
+              value={currentGenderYear}
+              onChange={(year) => handleFilterChange('genderYear', year)}
+              label="Select Year"
+            />
+          </div>
+        }
+        onFullscreen={() => handleFullscreenToggle("Gender Composition")}
+      >
+        <ResponsiveContainer width="100%" height="100%"> {/* CHANGED: height to 100% */}
+          <PieChart>
+                  <Pie
+                    data={pieChartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={2}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                    labelLine={false}
+                  >
+                    {pieChartData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={GENDER_COLORS[index % GENDER_COLORS.length]} 
+                        stroke="#1E293B"
+                        strokeWidth={2}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => [value?.toLocaleString() || 0, 'Count']} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </div>
         </div>
       ) : (
         <div className="empty-state">

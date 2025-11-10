@@ -310,14 +310,22 @@ const RegionsChart = React.memo(({ data, selectedYear, onYearChange, onFullscree
     <ChartContainer 
       title="Regional Distribution" 
       icon={<FiMapPin />}
-      className="full-width"
+      className="regional-distribution"
       onFullscreen={onFullscreen}
       filters={<YearDropdownFilter />}
     >
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={chartData}>
+      <ResponsiveContainer width="100%" height={400}>
+        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-          <XAxis dataKey="region" stroke="#ccc" angle={-45} textAnchor="end" height={80} />
+          <XAxis 
+            dataKey="region" 
+            stroke="#ccc" 
+            angle={-45} 
+            textAnchor="end" 
+            height={60}
+            interval={0}
+            tick={{ fontSize: 12 }}
+          />
           <YAxis stroke="#ccc" />
           <Tooltip formatter={(value) => [value.toLocaleString(), 'Emigrants']} />
           <Bar 
@@ -391,7 +399,7 @@ const DataStatusBadge = React.memo(({ count, label }) => (
   </div>
 ));
 
-// Full Screen Component - FIXED
+// Full Screen Component
 const FullScreenChart = React.memo(({ title, children, onClose, isOpen }) => {
   if (!isOpen) return null;
 
@@ -592,9 +600,17 @@ const FullScreenRegionsChart = React.memo(({ data, selectedYear }) => {
 
   return (
     <ResponsiveContainer width="100%" height="90%">
-      <BarChart data={chartData}>
+      <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-        <XAxis dataKey="region" stroke="#ccc" angle={-45} textAnchor="end" height={80} />
+        <XAxis 
+          dataKey="region" 
+          stroke="#ccc" 
+          angle={-45} 
+          textAnchor="end" 
+          height={80}
+          interval={0}
+          tick={{ fontSize: 14 }}
+        />
         <YAxis stroke="#ccc" />
         <Tooltip formatter={(value) => [value.toLocaleString(), 'Emigrants']} />
         <Legend />
@@ -760,67 +776,61 @@ const DashboardPage = ({
 
   return (
     <div className="dashboard">
-      {/* Data Status */}
-      <div className="data-status-indicator">
-        <div className="status-header">
-          <FiFileText />
-          <span>Data Overview</span>
+      {/* Header Section - Fixed */}
+      <div className="dashboard-header">
+        {/* Data Status */}
+        <div className="data-status-indicator">
+          <div className="status-header">
+            <FiFileText />
+            <span>Data Overview</span>
+          </div>
+          <div className="status-grid">
+            {dataTypes.map(dataType => (
+              <DataStatusBadge
+                key={dataType.value}
+                count={dataStats[dataType.value] || 0}
+                label={dataType.label}
+              />
+            ))}
+          </div>
         </div>
-        <div className="status-grid">
-          {dataTypes.map(dataType => (
-            <DataStatusBadge
-              key={dataType.value}
-              count={dataStats[dataType.value] || 0}
-              label={dataType.label}
-            />
-          ))}
+
+        {/* KPI Cards - Overall Data (No Filters) */}
+        <div className="kpi-grid">
+          <KpiCard 
+            title="Total Emigrants" 
+            value={overallData.totalEmigrants} 
+            icon={<FiUsers />}
+            color="#4A90E2"
+            subtitle="1981-2020"
+          />
+          <KpiCard 
+            title="Top Origin Province" 
+            value={overallData.topOriginProvince} 
+            icon={<FiMapPin />}
+            color="#7ED321"
+            subtitle="All Years"
+          />
+          <KpiCard 
+            title="Top Destination Country" 
+            value={overallData.topDestination} 
+            icon={<FiGlobe />}
+            color="#F5A623"
+            subtitle="All Years"
+          />
+          <KpiCard 
+            title="Top Region" 
+            value={overallData.topRegion} 
+            icon={<FiActivity />}
+            color="#BD10E0"
+            subtitle="All Years"
+          />
         </div>
       </div>
 
-      {/* KPI Cards - Overall Data (No Filters) */}
-      <div className="kpi-grid">
-        <KpiCard 
-          title="Total Emigrants" 
-          value={overallData.totalEmigrants} 
-          icon={<FiUsers />}
-          color="#4A90E2"
-          subtitle="1981-2020"
-        />
-        <KpiCard 
-          title="Top Origin Province" 
-          value={overallData.topOriginProvince} 
-          icon={<FiMapPin />}
-          color="#7ED321"
-          subtitle="All Years"
-        />
-        <KpiCard 
-          title="Top Destination Country" 
-          value={overallData.topDestination} 
-          icon={<FiGlobe />}
-          color="#F5A623"
-          subtitle="All Years"
-        />
-        <KpiCard 
-          title="Top Region" 
-          value={overallData.topRegion} 
-          icon={<FiActivity />}
-          color="#BD10E0"
-          subtitle="All Years"
-        />
-      </div>
-
-      {hasAnyData ? (
-        <>
-          {/* Full Screen Chart Overlay - FIXED */}
-          <FullScreenChart 
-            title={fullScreenChart}
-            onClose={() => setFullScreenChart(null)}
-            isOpen={!!fullScreenChart}
-          >
-            {renderFullScreenContent()}
-          </FullScreenChart>
-
-          {/* Charts Grid with Individual Filters - IMPROVED LAYOUT */}
+      {/* Charts Section - Scrollable */}
+      <div className="charts-container">
+        {hasAnyData ? (
           <div className={`charts-grid ${fullScreenChart ? 'blurred' : ''}`}>
             {/* Top Row: Full width charts */}
             <TrendsChart 
@@ -852,14 +862,23 @@ const DashboardPage = ({
               onFullscreen={() => handleFullscreenToggle("Top Destination Countries")}
             />
           </div>
-        </>
-      ) : (
-        <div className="empty-state">
-          <FiAlertCircle size={48} />
-          <h3>No Data Available</h3>
-          <p>Please upload data in the Data Management section.</p>
-        </div>
-      )}
+        ) : (
+          <div className="empty-state">
+            <FiAlertCircle size={48} />
+            <h3>No Data Available</h3>
+            <p>Please upload data in the Data Management section.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Full Screen Chart Overlay */}
+      <FullScreenChart 
+        title={fullScreenChart}
+        onClose={() => setFullScreenChart(null)}
+        isOpen={!!fullScreenChart}
+      >
+        {renderFullScreenContent()}
+      </FullScreenChart>
     </div>
   );
 };

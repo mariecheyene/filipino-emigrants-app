@@ -1,482 +1,484 @@
-/* Province Origin Page Styles - Dark Theme */
+/* ProvinceOriginPage.css - Namespaced styles for Province Origin page */
+
+/* Main container */
 .province-origin-page {
   padding: 1.25rem;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Page Header */
-.province-origin-page .page-header {
-  margin-bottom: 1.5rem;
-  text-align: left;
+.province-page-header {
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
-.province-origin-page .page-header h2 {
+.province-page-header h2 {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
-  color: var(--text);
   margin-bottom: 0.5rem;
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-size: 1.8rem;
+  color: var(--text);
+  font-weight: 700;
 }
 
-.province-origin-page .page-header p {
+.province-page-header p {
   color: var(--text-light);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   margin: 0;
+  font-weight: 400;
 }
 
-/* Charts Grid - UPDATED LAYOUT */
-.province-origin-page .charts-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto;
-  gap: 1.25rem;
+/* Charts Grid */
+.province-charts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   width: 100%;
+  height: 100%;
+  flex: 1;
 }
 
-.province-origin-page .charts-grid.blurred {
+.province-charts-grid.blurred {
   filter: blur(4px);
   pointer-events: none;
   user-select: none;
 }
 
-/* Chart Cards */
-.province-origin-page .chart-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  border: 1px solid var(--border);
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-}
-
-.province-origin-page .chart-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--border-light);
-}
-
-.province-origin-page .chart-card.full-width {
-  grid-column: 1 / -1;
-  height: 400px;
-}
-
-/* Composition Chart - Centered at bottom */
-.province-origin-page .chart-card:not(.full-width) {
-  height: 400px;
-  justify-self: center;
-  max-width: 600px;
+/* Full width chart rows with different heights */
+.province-chart-row-full {
   width: 100%;
 }
 
+.province-trend-chart-row {
+  height: 450px;
+  min-height: 450px;
+}
+
+.province-distribution-chart-row {
+  height: 600px;
+  min-height: 600px;
+}
+
+.province-composition-chart-row {
+  height: 650px;
+  min-height: 650px;
+}
+
+/* Chart Cards */
+.province-chart-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+}
+
+.province-chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+.province-chart-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.province-chart-card .province-chart-content {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
 /* Chart Header */
-.province-origin-page .chart-header {
+.province-chart-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
   flex-shrink: 0;
   gap: 1rem;
 }
 
-.province-origin-page .chart-title {
+.province-chart-title {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   flex: 1;
 }
 
-.province-origin-page .chart-icon {
+.province-chart-icon {
   color: var(--primary);
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   background: rgba(99, 102, 241, 0.1);
-  padding: 0.5rem;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0.75rem;
+  border-radius: 8px;
 }
 
-.province-origin-page .chart-header h4 {
+.province-chart-header h4 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--text);
 }
 
-.province-origin-page .chart-controls {
+/* Chart Controls */
+.province-chart-controls {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-/* Chart Filters */
-.province-origin-page .chart-filters-row {
-  display: flex;
-  align-items: center;
   gap: 1rem;
+  align-items: flex-start;
   flex-wrap: wrap;
 }
 
-.province-origin-page .chart-filter {
+.province-chart-filters-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.province-chart-filter {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 140px;
+}
+
+.province-chart-filter label {
+  color: var(--text-light);
+  font-size: 0.85rem;
+  font-weight: 500;
   white-space: nowrap;
 }
 
-.province-origin-page .chart-filter label {
-  font-size: 0.75rem;
-  color: var(--text-light);
-  font-weight: 600;
-}
-
-.province-origin-page .chart-filter select,
-.province-origin-page .chart-filter input {
-  padding: 0.4rem 0.6rem;
+.province-chart-filter select,
+.province-chart-filter input {
+  padding: 0.5rem 0.75rem;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: var(--radius);
   background: var(--surface-light);
   color: var(--text);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   transition: all 0.2s ease;
   font-family: 'Inter', sans-serif;
-  min-width: 120px;
 }
 
-.province-origin-page .chart-filter select:focus,
-.province-origin-page .chart-filter input:focus {
+.province-chart-filter select:focus,
+.province-chart-filter input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
-  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
-.province-origin-page .chart-filter input {
-  width: 70px;
-  text-align: center;
-}
-
-.province-origin-page .range-inputs {
+.province-range-inputs {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.province-origin-page .range-inputs span {
+.province-range-inputs input {
+  width: 80px;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.province-range-inputs span {
   color: var(--text-light);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 500;
 }
 
 /* Fullscreen Button */
-.province-origin-page .fullscreen-btn {
-  background: transparent;
+.province-fullscreen-btn {
+  background: rgba(255, 255, 255, 0.1);
   border: 1px solid var(--border);
   color: var(--text-light);
-  padding: 0.5rem;
+  padding: 0.6rem;
   border-radius: var(--radius);
   cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-  width: 32px;
-  height: 32px;
+  font-size: 1rem;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
 }
 
-.province-origin-page .fullscreen-btn:hover {
-  background: var(--surface-light);
+.province-fullscreen-btn:hover {
+  background: var(--primary);
+  color: white;
   border-color: var(--primary);
-  color: var(--primary);
+  transform: scale(1.05);
 }
 
-/* Chart Content */
-.province-origin-page .chart-content {
-  position: relative;
-  flex: 1;
+/* Composition container for donut chart and legend */
+.province-composition-container {
+  display: flex;
+  height: 100%;
+  gap: 2rem;
+  align-items: stretch;
   min-height: 0;
-  width: 100%;
 }
 
-/* Full Screen Overlay - MATCHING DASHBOARD STYLE */
-.province-origin-page .fullscreen-chart-overlay {
+.province-donut-chart-wrapper {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+}
+
+.province-legend-wrapper {
+  width: 300px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Pie Chart Legend */
+.province-pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  max-height: 100%;
+}
+
+.province-pie-legend::-webkit-scrollbar {
+  width: 6px;
+}
+
+.province-pie-legend::-webkit-scrollbar-track {
+  background: var(--surface-light);
+  border-radius: 3px;
+}
+
+.province-pie-legend::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.province-pie-legend::-webkit-scrollbar-thumb:hover {
+  background: var(--text-light);
+}
+
+.province-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.province-legend-item:hover {
+  background: var(--surface-dark);
+}
+
+.province-legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.province-legend-text {
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.4;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Fullscreen Styles */
+.province-fullscreen-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  backdrop-filter: blur(8px);
 }
 
-.province-origin-page .fullscreen-chart-container {
+.province-fullscreen-container {
   background: var(--surface);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: 2rem;
   width: 95vw;
-  height: 95vh;
+  height: 90vh;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border);
   box-shadow: var(--shadow-xl);
-  position: relative;
+  border: 1px solid var(--border);
 }
 
-.province-origin-page .fullscreen-chart-header {
+.province-fullscreen-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 
-.province-origin-page .fullscreen-chart-header h3 {
+.province-fullscreen-header h3 {
   margin: 0;
+  font-size: 1.8rem;
   color: var(--text);
-  font-size: 1.3rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  font-weight: 700;
 }
 
-.province-origin-page .close-fullscreen {
+.province-fullscreen-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.province-close-fullscreen {
   background: var(--danger);
   color: white;
   border: none;
-  padding: 0.6rem 1rem;
+  padding: 0.75rem 1.5rem;
   border-radius: var(--radius);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   transition: all 0.2s ease;
 }
 
-.province-origin-page .close-fullscreen:hover {
-  background: #DC2626;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+.province-close-fullscreen:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
 
-.province-origin-page .fullscreen-chart-content {
+.province-fullscreen-content {
   flex: 1;
-  min-height: 0;
   width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Empty State */
-.province-origin-page .empty-state {
-  text-align: center;
-  padding: 3rem 1rem;
+/* Fullscreen composition layout */
+.province-fullscreen-composition-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 3rem;
+  align-items: stretch;
+  justify-content: center;
+  min-height: 0;
+}
+
+.province-fullscreen-donut-wrapper {
+  flex: 1;
+  height: 100%;
+  max-width: 60%;
+  min-height: 0;
+}
+
+.province-fullscreen-legend-wrapper {
+  width: 350px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-light);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+}
+
+.province-fullscreen-legend-wrapper .province-pie-legend {
+  max-height: none;
+  flex: 1;
+}
+
+/* Custom tooltip styling */
+.province-custom-tooltip {
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+}
+
+.province-custom-tooltip .province-tooltip-label {
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.province-custom-tooltip .province-tooltip-value {
   color: var(--text-light);
+  margin: 0.25rem 0;
+  font-size: 0.85rem;
+}
+
+/* Empty state */
+.province-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  height: 100%;
   gap: 1rem;
-  grid-column: 1 / -1;
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
+  text-align: center;
+  color: var(--text-light);
+  padding: 2rem;
 }
 
-.province-origin-page .empty-state h3 {
+.province-empty-state h3 {
   color: var(--text);
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
 }
 
-.province-origin-page .empty-state p {
-  font-size: 0.9rem;
+.province-empty-state p {
   margin: 0;
-  color: var(--text-light);
-}
-
-/* Recharts Customization for Dark Theme */
-.province-origin-page .recharts-cartesian-grid-horizontal line,
-.province-origin-page .recharts-cartesian-grid-vertical line {
-  stroke: var(--border);
-  stroke-dasharray: 3 3;
-}
-
-.province-origin-page .recharts-text {
-  fill: var(--text-light);
-  font-size: 0.8rem;
-  font-family: 'Inter', sans-serif;
-}
-
-.province-origin-page .recharts-label {
-  fill: var(--text-light);
-  font-family: 'Inter', sans-serif;
-}
-
-.province-origin-page .recharts-tooltip-wrapper {
-  z-index: 100;
-}
-
-.province-origin-page .recharts-default-tooltip {
-  background: var(--surface) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius) !important;
-  box-shadow: var(--shadow-lg) !important;
-}
-
-.province-origin-page .recharts-tooltip-item {
-  color: var(--text) !important;
-  font-family: 'Inter', sans-serif !important;
-}
-
-.province-origin-page .recharts-tooltip-item-name {
-  color: var(--text-light) !important;
-}
-
-.province-origin-page .recharts-legend-wrapper {
-  color: var(--text-light);
-}
-
-.province-origin-page .recharts-legend-item-text {
-  color: var(--text-light) !important;
-  font-family: 'Inter', sans-serif;
-}
-
-/* Responsive Design */
-@media (min-width: 1200px) {
-  .province-origin-page .charts-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-  }
-  
-  .province-origin-page .chart-card.full-width {
-    grid-column: 1 / -1;
-  }
-  
-  /* Center the composition chart */
-  .province-origin-page .chart-card:not(.full-width) {
-    grid-column: 1 / -1;
-    justify-self: center;
-    max-width: 600px;
-    margin-top: 0.5rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .province-origin-page .chart-card:not(.full-width) {
-    max-width: 500px;
-  }
-}
-
-@media (max-width: 768px) {
-  .province-origin-page {
-    padding: 1rem;
-  }
-  
-  .province-origin-page .chart-card {
-    height: 350px !important;
-  }
-  
-  .province-origin-page .chart-card:not(.full-width) {
-    max-width: 100%;
-    justify-self: stretch;
-  }
-  
-  .province-origin-page .chart-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-  
-  .province-origin-page .chart-controls {
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  .province-origin-page .chart-filters-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-    width: 100%;
-  }
-  
-  .province-origin-page .chart-filter {
-    justify-content: space-between;
-    width: 100%;
-  }
-  
-  .province-origin-page .chart-filter select,
-  .province-origin-page .chart-filter input {
-    min-width: auto;
-    flex: 1;
-  }
-  
-  .province-origin-page .fullscreen-chart-overlay {
-    padding: 1rem;
-  }
-  
-  .province-origin-page .fullscreen-chart-container {
-    padding: 1rem;
-  }
-  
-  .province-origin-page .fullscreen-chart-header {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-  
-  .province-origin-page .fullscreen-chart-header h3 {
-    font-size: 1.1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .province-origin-page {
-    padding: 0.75rem;
-  }
-  
-  .province-origin-page .chart-card {
-    padding: 1rem;
-    height: 320px !important;
-  }
-  
-  .province-origin-page .chart-controls {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  
-  .province-origin-page .range-inputs {
-    justify-content: center;
-  }
-  
-  .province-origin-page .chart-card:not(.full-width) {
-    max-width: 100%;
-  }
+  font-size: 0.9rem;
+  max-width: 300px;
+  line-height: 1.5;
 }
 
 /* Animation for chart transitions */
-.province-origin-page .chart-card {
-  animation: fadeInUp 0.5s ease-out;
+.province-chart-card {
+  animation: provinceFadeInUp 0.5s ease-out;
 }
 
-@keyframes fadeInUp {
+@keyframes provinceFadeInUp {
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -487,15 +489,199 @@
   }
 }
 
-/* Composition Chart Specific Styles */
-.province-origin-page .composition-chart {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .province-trend-chart-row {
+    height: 400px;
+  }
+  
+  .province-distribution-chart-row {
+    height: 550px;
+  }
+  
+  .province-composition-chart-row {
+    height: 600px;
+  }
+  
+  .province-composition-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .province-legend-wrapper {
+    width: 100%;
+    max-height: 200px;
+  }
+  
+  .province-pie-legend {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow-y: visible;
+  }
+  
+  .province-legend-item {
+    flex: 0 0 calc(33.333% - 1rem);
+    min-width: 120px;
+  }
+  
+  .province-fullscreen-composition-container {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .province-fullscreen-donut-wrapper {
+    max-width: 100%;
+    height: 60%;
+  }
+  
+  .province-fullscreen-legend-wrapper {
+    width: 100%;
+    max-height: 35%;
+  }
 }
 
-.province-origin-page .composition-chart .chart-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+@media (max-width: 768px) {
+  .province-origin-page {
+    padding: 1rem;
+  }
+
+  .province-page-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .province-page-header p {
+    font-size: 1rem;
+  }
+
+  .province-chart-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .province-chart-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .province-chart-filters-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+  }
+  
+  .province-chart-filter {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .province-chart-filter select,
+  .province-chart-filter input {
+    flex: 1;
+    max-width: 150px;
+  }
+  
+  .province-fullscreen-overlay {
+    padding: 1rem;
+  }
+  
+  .province-fullscreen-container {
+    padding: 1.5rem;
+    width: 98vw;
+    height: 95vh;
+  }
+  
+  .province-fullscreen-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .province-fullscreen-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .province-trend-chart-row {
+    height: 350px;
+  }
+  
+  .province-distribution-chart-row {
+    height: 500px;
+  }
+  
+  .province-composition-chart-row {
+    height: 550px;
+  }
+  
+  .province-legend-item {
+    flex: 0 0 calc(50% - 1rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .province-origin-page {
+    padding: 0.75rem;
+  }
+
+  .province-page-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .province-page-header p {
+    font-size: 0.9rem;
+  }
+
+  .province-chart-header h4 {
+    font-size: 1.1rem;
+  }
+
+  .province-fullscreen-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .province-range-inputs input {
+    width: 60px;
+  }
+  
+  .province-trend-chart-row {
+    height: 320px;
+  }
+  
+  .province-distribution-chart-row {
+    height: 450px;
+  }
+  
+  .province-composition-chart-row {
+    height: 500px;
+  }
+  
+  .province-legend-text {
+    font-size: 0.8rem;
+  }
+  
+  .province-legend-item {
+    flex: 0 0 100%;
+  }
+}
+
+/* Custom scrollbar for province page */
+.province-origin-page::-webkit-scrollbar {
+  width: 6px;
+}
+
+.province-origin-page::-webkit-scrollbar-track {
+  background: var(--surface-light);
+}
+
+.province-origin-page::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.province-origin-page::-webkit-scrollbar-thumb:hover {
+  background: var(--text-light);
 }

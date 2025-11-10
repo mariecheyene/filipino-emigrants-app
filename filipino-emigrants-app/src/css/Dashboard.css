@@ -1,13 +1,22 @@
-/* Dashboard.css - Individual chart filters version */
+/* Dashboard.css - Fixed header, scrollable charts */
 
 /* Dashboard Layout */
 .dashboard {
   padding: 1.25rem;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   width: 100%;
+  height: 100vh; /* Full viewport height */
+  overflow: hidden; /* Prevent entire dashboard from scrolling */
+}
+
+/* Header Section - Fixed at top */
+.dashboard-header {
+  flex-shrink: 0; /* Prevent shrinking */
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 /* Data Status Indicator */
@@ -165,12 +174,20 @@
   font-weight: 500;
 }
 
-/* Charts Grid */
+/* Charts Container - SCROLLABLE SECTION */
+.charts-container {
+  flex: 1; /* Take remaining space */
+  overflow-y: auto; /* Make only charts scrollable */
+  min-height: 0; /* Important for flex child scrolling */
+}
+
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
   gap: 1.25rem;
   width: 100%;
+  padding-bottom: 1rem; /* Space at bottom */
 }
 
 .charts-grid.blurred {
@@ -188,7 +205,7 @@
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  height: 400px;
+  height: 400px; /* Normal height for regular charts */
 }
 
 .chart-card:hover {
@@ -198,6 +215,13 @@
 
 .chart-card.full-width {
   grid-column: 1 / -1;
+  height: 400px; /* Normal height for full-width charts like Trends */
+}
+
+/* SPECIFIC HEIGHT FOR REGIONAL DISTRIBUTION ONLY */
+.chart-card.regional-distribution {
+  grid-column: 1 / -1;
+  height: 600px; /* Extra tall only for regional distribution */
 }
 
 .chart-header {
@@ -401,10 +425,10 @@
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  grid-column: 1 / -1;
   background: var(--surface);
   border-radius: var(--radius);
   border: 1px solid var(--border);
+  margin: 1rem 0;
 }
 
 .empty-state h3 {
@@ -451,7 +475,7 @@
   font-size: 0.8rem !important;
 }
 
-/* Chart Axis Styling */
+/* Chart Axis Styling - IMPROVED FOR REGIONAL DISTRIBUTION */
 .recharts-cartesian-axis-tick-value {
   fill: var(--text-light) !important;
   font-size: 0.75rem !important;
@@ -465,6 +489,15 @@
   stroke: var(--border-light) !important;
 }
 
+/* Improved X-axis styling for regional distribution chart */
+.recharts-x-axis.xAxis {
+  overflow: visible !important;
+}
+
+.recharts-x-axis .recharts-cartesian-axis-tick {
+  font-size: 11px !important;
+}
+
 /* Pie Chart Labels */
 .recharts-pie-label-text {
   fill: var(--text) !important;
@@ -472,13 +505,43 @@
   font-weight: 500;
 }
 
+/* Bar Chart specific improvements */
+.recharts-bar-rectangle {
+  transition: all 0.2s ease;
+}
+
+.recharts-bar-rectangle:hover {
+  opacity: 0.8;
+}
+
+/* Custom scrollbar for charts container */
+.charts-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.charts-container::-webkit-scrollbar-track {
+  background: var(--surface-light);
+  border-radius: 4px;
+}
+
+.charts-container::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.charts-container::-webkit-scrollbar-thumb:hover {
+  background: var(--text-light);
+}
+
 /* Responsive Design for Dashboard */
-@media (max-width: 1200px) {
+@media (min-width: 1200px) {
   .charts-grid {
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
   }
   
-  .chart-card.full-width {
+  .chart-card.full-width,
+  .chart-card.regional-distribution {
     grid-column: 1 / -1;
   }
 }
@@ -509,6 +572,14 @@
   
   .chart-card {
     height: 350px;
+  }
+  
+  .chart-card.full-width {
+    height: 350px;
+  }
+  
+  .chart-card.regional-distribution {
+    height: 500px;
   }
   
   .chart-header {
@@ -565,6 +636,14 @@
     height: 300px;
   }
   
+  .chart-card.full-width {
+    height: 300px;
+  }
+  
+  .chart-card.regional-distribution {
+    height: 450px;
+  }
+  
   .chart-controls {
     flex-direction: column;
     align-items: flex-start;
@@ -577,6 +656,11 @@
   
   .range-inputs input {
     width: 60px;
+  }
+  
+  /* Improve X-axis labels on very small screens */
+  .recharts-x-axis .recharts-cartesian-axis-tick {
+    font-size: 10px !important;
   }
 }
 
@@ -595,142 +679,60 @@
     transform: translateY(0);
   }
 }
-/* Add these styles to your existing Dashboard.css */
 
-/* Improved Charts Grid Layout */
-.charts-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto;
-  gap: 1.25rem;
-  width: 100%;
+/* Additional improvements for better chart readability */
+.recharts-wrapper {
+  font-family: 'Inter', sans-serif;
 }
 
-.charts-grid .chart-card.full-width {
-  grid-column: 1 / -1;
+.recharts-legend-wrapper {
+  bottom: -10px !important;
 }
 
-/* For larger screens, show 2x2 grid */
-@media (min-width: 1200px) {
-  .charts-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-  }
-  
-  .charts-grid .chart-card.full-width {
-    grid-column: 1 / -1;
-  }
+/* Ensure proper spacing for charts with angled labels */
+.recharts-cartesian-axis-ticks {
+  overflow: visible;
 }
 
-/* Full Screen Fixes */
-.fullscreen-chart-overlay {
-  position: fixed;
+/* Loading states */
+.chart-card.loading {
+  position: relative;
+}
+
+.chart-card.loading::after {
+  content: '';
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(15, 23, 42, 0.95);
-  z-index: 1000;
+  background: rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  backdrop-filter: blur(8px);
-}
-
-.fullscreen-chart-container {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  width: 95vw;
-  height: 95vh;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-xl);
-  position: relative;
-}
-
-.fullscreen-chart-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
-.fullscreen-chart-header h3 {
-  margin: 0;
-  color: var(--text);
-  font-size: 1.3rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.close-fullscreen {
-  background: var(--danger);
-  color: white;
-  border: none;
-  padding: 0.6rem 1rem;
   border-radius: var(--radius);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
-  font-size: 0.85rem;
-  transition: all 0.2s ease;
 }
 
-.close-fullscreen:hover {
-  background: #DC2626;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
-}
-
-.fullscreen-chart-content {
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-}
-
-/* Blur effect when full screen is active */
-.charts-grid.blurred {
-  filter: blur(4px);
-  pointer-events: none;
-  user-select: none;
-}
-
-/* Better spacing for full width charts */
-.chart-card.full-width {
-  margin-bottom: 0;
-}
-
-/* Ensure proper chart heights */
-.chart-card {
-  height: 400px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .charts-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
+/* Print styles */
+@media print {
+  .dashboard {
+    padding: 0;
+    height: auto;
+    overflow: visible;
+  }
+  
+  .charts-container {
+    overflow: visible;
+  }
+  
+  .chart-controls,
+  .fullscreen-btn {
+    display: none;
   }
   
   .chart-card {
-    height: 350px;
-  }
-  
-  .fullscreen-chart-overlay {
-    padding: 1rem;
-  }
-  
-  .fullscreen-chart-container {
-    padding: 1rem;
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
   }
 }

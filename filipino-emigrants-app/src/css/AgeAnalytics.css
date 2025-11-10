@@ -8,38 +8,30 @@
 .age-analytics-page .charts-grid {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 2rem;
   width: 100%;
   height: 100%;
   flex: 1;
 }
 
-/* Top row - two equal charts that occupy full available space */
-.age-analytics-page .charts-top-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+/* Full width chart rows with different heights */
+.age-analytics-page .chart-row-full {
   width: 100%;
+}
+
+.age-analytics-page .trend-chart-row {
   height: 400px;
   min-height: 400px;
 }
 
-/* Bottom row - single large chart with proper spacing */
-.age-analytics-page .charts-bottom-row {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  height: 450px;
-  min-height: 450px;
-  margin-top: 2rem;
+.age-analytics-page .distribution-chart-row {
+  height: 550px; /* Even taller for X-axis labels */
+  min-height: 550px;
 }
 
-/* Centered trend chart with max width */
-.age-analytics-page .centered-trend-chart {
-  width: 100%;
-  max-width: 1000px;
-  margin: 0 auto;
-  height: 100%;
+.age-analytics-page .composition-chart-row {
+  height: 600px; /* Much taller for legend */
+  min-height: 600px;
 }
 
 /* Ensure chart cards fill their containers */
@@ -57,8 +49,93 @@
 
 .age-analytics-page .chart-card .chart-content {
   flex: 1;
-  min-height: 300px;
   height: 100%;
+  min-height: 0; /* Important for flexbox scrolling */
+  overflow: hidden; /* Prevent content overflow */
+}
+
+/* Composition container for donut chart and legend */
+.age-analytics-page .composition-container {
+  display: flex;
+  height: 100%;
+  gap: 2rem;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.age-analytics-page .donut-chart-wrapper {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+}
+
+.age-analytics-page .legend-wrapper {
+  width: 300px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Pie Chart Legend */
+.pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  max-height: 100%;
+}
+
+/* Custom scrollbar for legend */
+.pie-legend::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pie-legend::-webkit-scrollbar-track {
+  background: var(--surface-light);
+  border-radius: 3px;
+}
+
+.pie-legend::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.pie-legend::-webkit-scrollbar-thumb:hover {
+  background: var(--text-light);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.legend-item:hover {
+  background: var(--surface-dark);
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.legend-text {
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.4;
+  flex: 1;
+  min-width: 0;
 }
 
 /* Chart header with proper controls alignment */
@@ -156,7 +233,7 @@
   font-size: 0.8rem;
 }
 
-/* Fullscreen button - placed properly like in sample */
+/* Fullscreen button */
 .age-analytics-page .fullscreen-btn {
   background: none;
   border: none;
@@ -246,8 +323,69 @@
 
 .age-analytics-page .fullscreen-chart-content {
   flex: 1;
-  padding: 1.5rem;
+  padding: 2rem;
   height: calc(100% - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+/* Fullscreen composition layout */
+.fullscreen-composition-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 3rem;
+  align-items: stretch;
+  justify-content: center;
+  min-height: 0;
+}
+
+.fullscreen-donut-wrapper {
+  flex: 1;
+  height: 100%;
+  max-width: 60%;
+  min-height: 0;
+}
+
+.fullscreen-legend-wrapper {
+  width: 350px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-light);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+}
+
+.fullscreen-legend-wrapper .pie-legend {
+  max-height: none;
+  flex: 1;
+}
+
+/* Custom tooltip styling */
+.custom-tooltip {
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.custom-tooltip .tooltip-label {
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.25rem;
+}
+
+.custom-tooltip .tooltip-value {
+  color: var(--text-light);
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
 }
 
 /* Blur effect when fullscreen is active */
@@ -269,26 +407,60 @@
   color: var(--text-light);
 }
 
+/* Bar chart specific adjustments for X-axis */
+.age-analytics-page .distribution-chart-row .recharts-wrapper {
+  margin-bottom: 20px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1200px) {
-  .age-analytics-page .charts-top-row {
-    grid-template-columns: 1fr;
-    height: auto;
-    min-height: auto;
+  .age-analytics-page .trend-chart-row {
+    height: 350px;
+  }
+  
+  .age-analytics-page .distribution-chart-row {
+    height: 500px;
+  }
+  
+  .age-analytics-page .composition-chart-row {
+    height: 550px;
+  }
+  
+  .age-analytics-page .composition-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .age-analytics-page .legend-wrapper {
+    width: 100%;
+    max-height: 200px;
+  }
+  
+  .pie-legend {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow-y: visible;
+  }
+  
+  .legend-item {
+    flex: 0 0 calc(33.333% - 1rem);
+    min-width: 120px;
+  }
+  
+  .fullscreen-composition-container {
+    flex-direction: column;
     gap: 2rem;
   }
   
-  .age-analytics-page .charts-top-row .chart-card {
-    height: 400px;
-  }
-  
-  .age-analytics-page .charts-bottom-row {
-    height: 400px;
-    margin-top: 2rem;
-  }
-  
-  .age-analytics-page .centered-trend-chart {
+  .fullscreen-donut-wrapper {
     max-width: 100%;
+    height: 60%;
+  }
+  
+  .fullscreen-legend-wrapper {
+    width: 100%;
+    max-height: 35%;
   }
 }
 
@@ -338,10 +510,20 @@
     justify-content: space-between;
   }
   
-  .age-analytics-page .charts-top-row,
-  .age-analytics-page .charts-bottom-row {
-    height: auto;
-    min-height: 350px;
+  .age-analytics-page .trend-chart-row {
+    height: 300px;
+  }
+  
+  .age-analytics-page .distribution-chart-row {
+    height: 450px;
+  }
+  
+  .age-analytics-page .composition-chart-row {
+    height: 500px;
+  }
+  
+  .legend-item {
+    flex: 0 0 calc(50% - 1rem);
   }
 }
 
@@ -355,8 +537,23 @@
     width: 60px;
   }
   
-  .age-analytics-page .charts-top-row .chart-card,
-  .age-analytics-page .charts-bottom-row .chart-card {
-    height: 300px;
+  .age-analytics-page .trend-chart-row {
+    height: 280px;
+  }
+  
+  .age-analytics-page .distribution-chart-row {
+    height: 400px;
+  }
+  
+  .age-analytics-page .composition-chart-row {
+    height: 450px;
+  }
+  
+  .legend-text {
+    font-size: 0.8rem;
+  }
+  
+  .legend-item {
+    flex: 0 0 100%;
   }
 }

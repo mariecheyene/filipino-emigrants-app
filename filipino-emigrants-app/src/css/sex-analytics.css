@@ -1,19 +1,21 @@
-/* Sex Analytics Page Styles - Two Column Layout */
+/* Sex Analytics Page Styles - Match Dashboard Layout */
 .sex-analytics-page {
+  padding: 1.25rem;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
   width: 100%;
 }
 
-/* Enhanced Page Header */
+/* Enhanced Page Header - Match Dashboard Style */
 .sex-analytics-page .page-header {
   background: linear-gradient(135deg, var(--surface) 0%, var(--surface-dark) 100%);
   padding: 1.5rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 
 .sex-analytics-page .page-header h2 {
@@ -40,172 +42,290 @@
   font-weight: 400;
 }
 
-/* Two Column Layout for Charts */
+/* Charts Grid - Match Dashboard Layout */
 .sex-analytics-page .charts-grid.two-column-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: 1.25rem;
   width: 100%;
 }
 
-/* Enhanced Chart Cards - Equal Size */
+/* Chart Cards - Match Dashboard Style */
 .sex-analytics-page .chart-card {
   background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  border-radius: var(--radius);
+  padding: 1.25rem;
   border: 1px solid var(--border);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  height: 450px; /* Fixed equal height */
-  min-height: 450px;
+  height: 400px;
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .sex-analytics-page .chart-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
-  border-color: var(--primary);
 }
 
-/* Chart Header with Controls */
+/* FIXED: Chart Header - Proper layout with no overlap */
 .sex-analytics-page .chart-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
   flex-shrink: 0;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border-light);
+  gap: 1rem;
+  width: 100%;
 }
 
 .sex-analytics-page .chart-title {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0; /* Prevent flex item from overflowing */
 }
 
 .sex-analytics-page .chart-icon {
   color: var(--primary);
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   background: rgba(99, 102, 241, 0.1);
-  padding: 0.6rem;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 6px;
+  flex-shrink: 0;
 }
 
 .sex-analytics-page .chart-header h4 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Chart Controls */
+/* FIXED: Chart Controls - Proper spacing and alignment */
 .sex-analytics-page .chart-controls {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 
 .sex-analytics-page .chart-filters-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
-/* Chart Filter Components */
+/* Chart Filter Components - Match Dashboard */
 .sex-analytics-page .chart-filter {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--surface-light);
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  transition: all 0.2s ease;
-}
-
-.sex-analytics-page .chart-filter:hover {
-  border-color: var(--primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sex-analytics-page .chart-filter label {
-  color: var(--text);
+  color: var(--text-light);
+  font-size: 0.75rem;
   font-weight: 600;
-  font-size: 0.8rem;
-  white-space: nowrap;
-  margin: 0;
 }
 
-.sex-analytics-page .chart-filter select {
-  background: transparent;
-  border: none;
-  color: var(--text);
-  font-size: 0.8rem;
-  padding: 0.25rem 0;
-  min-width: 120px;
-  outline: none;
-  cursor: pointer;
-}
-
-.sex-analytics-page .chart-filter select option {
-  background: var(--surface);
-  color: var(--text);
-}
-
-/* Range Inputs */
-.sex-analytics-page .range-inputs {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.sex-analytics-page .range-inputs input {
-  width: 70px;
-  padding: 0.25rem 0.5rem;
-  border: 1px solid var(--border-light);
+.sex-analytics-page .chart-filter select,
+.sex-analytics-page .chart-filter input {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
   border-radius: 4px;
-  background: var(--surface);
+  background: var(--surface-light);
   color: var(--text);
-  font-size: 0.8rem;
-  text-align: center;
+  font-size: 0.75rem;
   transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+  min-width: 0; /* Allow inputs to shrink properly */
 }
 
-.sex-analytics-page .range-inputs input:focus {
+.sex-analytics-page .chart-filter select:focus,
+.sex-analytics-page .chart-filter input:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
 }
 
-.sex-analytics-page .range-inputs span {
-  color: var(--text-light);
-  font-size: 0.8rem;
-  font-weight: 500;
+.sex-analytics-page .range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
-/* Chart Content */
-.sex-analytics-page .chart-content {
-  flex: 1;
-  width: 100%;
+.sex-analytics-page .range-inputs input {
+  width: 70px;
+  text-align: center;
+}
+
+.sex-analytics-page .range-inputs span {
+  color: var(--text-light);
+  font-size: 0.75rem;
+}
+
+/* FIXED: Fullscreen Button - Proper positioning */
+.sex-analytics-page .fullscreen-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  margin-left: auto; /* Push to the right */
 }
 
-/* Recharts Customization */
+.sex-analytics-page .fullscreen-btn:hover {
+  background: var(--surface-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.sex-analytics-page .chart-content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Empty State - Match Dashboard */
+.sex-analytics-page .empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.sex-analytics-page .empty-state h3 {
+  color: var(--text);
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.sex-analytics-page .empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+/* Full Screen Chart Styles - Match Dashboard Exactly */
+.fullscreen-chart-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  backdrop-filter: blur(8px);
+}
+
+.fullscreen-chart-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  width: 95vw;
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
+  position: relative;
+}
+
+.fullscreen-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.fullscreen-chart-header h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.close-fullscreen {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.close-fullscreen:hover {
+  background: #DC2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.fullscreen-chart-content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Blur effect when full screen is active */
+.sex-analytics-page .charts-grid.blurred {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Recharts Customization - Match Dashboard */
 .sex-analytics-page .recharts-wrapper {
   font-family: 'Inter', sans-serif;
 }
 
 .sex-analytics-page .recharts-cartesian-axis-tick-value {
-  fill: var(--text-light);
-  font-size: 0.75rem;
-  font-weight: 500;
+  fill: var(--text-light) !important;
+  font-size: 0.75rem !important;
 }
 
 .sex-analytics-page .recharts-legend-wrapper {
@@ -214,8 +334,7 @@
 
 .sex-analytics-page .recharts-legend-item-text {
   color: var(--text) !important;
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.8rem !important;
 }
 
 .sex-analytics-page .recharts-tooltip-wrapper {
@@ -232,7 +351,6 @@
   border-radius: var(--radius);
   padding: 0.75rem 1rem;
   box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(10px);
 }
 
 .sex-analytics-page .custom-tooltip p {
@@ -250,55 +368,19 @@
   padding-bottom: 0.25rem;
 }
 
-/* Empty State */
-.sex-analytics-page .empty-state {
-  text-align: center;
-  padding: 3rem 2rem;
-  color: var(--text-light);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  grid-column: 1 / -1;
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  margin: 1rem 0;
-}
-
-.sex-analytics-page .empty-state svg {
-  color: var(--text-lighter);
-  opacity: 0.7;
-}
-
-.sex-analytics-page .empty-state h3 {
-  color: var(--text);
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.sex-analytics-page .empty-state p {
-  color: var(--text-light);
-  font-size: 0.9rem;
-  margin: 0;
-  max-width: 300px;
-  line-height: 1.5;
-}
-
-/* Responsive Design */
+/* Responsive Design - Match Dashboard */
 @media (max-width: 1200px) {
   .sex-analytics-page .charts-grid.two-column-layout {
     grid-template-columns: 1fr;
   }
-  
-  .sex-analytics-page .chart-card {
-    height: auto;
-    min-height: 400px;
-  }
 }
 
 @media (max-width: 768px) {
+  .sex-analytics-page {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
   .sex-analytics-page .page-header {
     padding: 1.25rem;
   }
@@ -308,163 +390,103 @@
   }
   
   .sex-analytics-page .chart-card {
-    padding: 1.25rem;
-    min-height: 350px;
+    padding: 1rem;
+    height: 350px;
   }
   
+  /* FIXED: Mobile layout for chart header - no overlap */
   .sex-analytics-page .chart-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .sex-analytics-page .chart-title {
+    justify-content: space-between;
+  }
+  
+  .sex-analytics-page .chart-controls {
+    width: 100%;
+    justify-content: space-between;
+    order: 2;
+  }
+  
+  .sex-analytics-page .chart-filters-row {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .sex-analytics-page .fullscreen-btn {
+    margin-left: 0;
+    order: 1;
+  }
+  
+  .fullscreen-chart-overlay {
+    padding: 1rem;
+  }
+  
+  .fullscreen-chart-container {
+    padding: 1rem;
+  }
+  
+  .fullscreen-chart-header {
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
   }
   
-  .sex-analytics-page .chart-controls {
-    width: 100%;
-    justify-content: flex-start;
-  }
-  
-  .sex-analytics-page .chart-filters-row {
-    gap: 0.75rem;
-  }
-  
-  .sex-analytics-page .chart-filter {
-    flex: 1;
-    min-width: 140px;
+  .fullscreen-chart-header h3 {
+    font-size: 1.1rem;
   }
 }
 
 @media (max-width: 480px) {
   .sex-analytics-page {
-    gap: 1rem;
-  }
-  
-  .sex-analytics-page .page-header {
-    padding: 1rem;
+    padding: 0.75rem;
   }
   
   .sex-analytics-page .chart-card {
     padding: 1rem;
-    min-height: 300px;
+    height: 300px;
+  }
+  
+  .sex-analytics-page .chart-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
   }
   
   .sex-analytics-page .chart-filters-row {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.5rem;
   }
   
   .sex-analytics-page .chart-filter {
     justify-content: space-between;
   }
-}
-/* Full Screen Chart Styles */
-.fullscreen-chart-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(10px);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  
+  .sex-analytics-page .range-inputs {
+    justify-content: center;
+  }
+  
+  .sex-analytics-page .range-inputs input {
+    width: 60px;
+  }
+  
+  .sex-analytics-page .fullscreen-btn {
+    align-self: flex-end;
+  }
 }
 
-.fullscreen-chart-container {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-xl);
-  width: 95%;
-  height: 95%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.fullscreen-chart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-dark);
-  flex-shrink: 0;
-}
-
-.fullscreen-chart-header h3 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.close-fullscreen {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-}
-
-.close-fullscreen:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
-
-.fullscreen-chart-content {
-  flex: 1;
-  padding: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Fullscreen button in chart headers */
-.fullscreen-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--border);
-  color: var(--text-light);
-  padding: 0.5rem;
-  border-radius: var(--radius);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: var(--primary);
-  color: var(--text);
-  transform: translateY(-1px);
-}
-
-/* Blur effect when fullscreen is active */
-.sex-analytics-page .charts-grid.blurred {
-  filter: blur(5px);
-  pointer-events: none;
-  user-select: none;
-}
-
-/* Enhanced chart controls for fullscreen */
-.sex-analytics-page .chart-controls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-/* Make sure fullscreen charts have proper sizing */
-.fullscreen-chart-content .recharts-wrapper {
-  width: 100% !important;
-  height: 100% !important;
+/* Animation for chart transitions - Match Dashboard */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -87,7 +87,7 @@ h4 {
   overflow: hidden;
 }
 
-/* ===== SIDEBAR - Left-Aligned Design ===== */
+/* ===== SIDEBAR - Fixed with proper toggle ===== */
 .sidebar {
   width: 240px;
   background: linear-gradient(180deg, var(--surface-dark) 0%, var(--surface) 100%);
@@ -101,6 +101,13 @@ h4 {
   overflow: hidden;
   box-shadow: var(--shadow-xl);
   flex-shrink: 0;
+  left: 0;
+  top: 0;
+}
+
+/* Collapsed state for sidebar - shows only icons */
+.sidebar:not(.open) {
+  width: 70px; /* Reduced width for icons only */
 }
 
 .sidebar-header {
@@ -108,14 +115,41 @@ h4 {
   border-bottom: 1px solid var(--border);
   background: var(--surface-dark);
   flex-shrink: 0;
-  text-align: left; /* Ensure left alignment */
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+/* Hide header text when collapsed */
+.sidebar:not(.open) .sidebar-header {
+  padding: 1.25rem 0.5rem;
+  text-align: center;
+}
+
+.sidebar:not(.open) .logo-section h2 {
+  display: none;
 }
 
 .logo-section {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  justify-content: flex-start; /* Left align logo */
+  justify-content: flex-start;
+  transition: all 0.3s ease;
+}
+
+/* Center logo when collapsed */
+.sidebar:not(.open) .logo-section {
+  justify-content: center;
+  gap: 0;
+}
+
+.logo-section h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.2;
+  transition: all 0.3s ease;
 }
 
 /* Navigation - Left Aligned */
@@ -126,7 +160,7 @@ h4 {
   flex-direction: column;
   gap: 0.125rem;
   overflow: hidden;
-  align-items: stretch; /* Stretch items to full width */
+  align-items: stretch;
 }
 
 .nav-item {
@@ -145,8 +179,14 @@ h4 {
   position: relative;
   font-weight: 500;
   white-space: nowrap;
-  text-align: left; /* Left align text */
-  justify-content: flex-start; /* Left align content */
+  text-align: left;
+  justify-content: flex-start;
+}
+
+/* Adjust padding for collapsed state */
+.sidebar:not(.open) .nav-item {
+  padding: 0.75rem 0.5rem;
+  justify-content: center;
 }
 
 .nav-item:hover {
@@ -161,10 +201,11 @@ h4 {
 }
 
 .nav-icon {
-  font-size: 1rem;
-  width: 20px; /* Fixed width for alignment */
-  text-align: left; /* Left align icons */
+  font-size: 1.2rem; /* Slightly larger icons for better visibility */
+  width: 24px; /* Fixed width for alignment */
+  text-align: center;
   transition: transform 0.2s ease;
+  flex-shrink: 0;
 }
 
 .nav-label {
@@ -172,35 +213,32 @@ h4 {
   font-weight: 500;
   flex: 1;
   font-size: 0.85rem;
-  text-align: left; /* Left align labels */
+  text-align: left;
+  transition: all 0.3s ease;
 }
 
-.logo-section h2 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text);
-  margin: 0;
-  line-height: 1.2;
+/* Hide labels when sidebar is collapsed */
+.sidebar:not(.open) .nav-label {
+  display: none;
 }
 
-
-.nav-label {
-  white-space: nowrap;
-  font-weight: 500;
-  flex: 1;
-  font-size: 0.85rem;
-}
-
-/* ===== MAIN CONTENT ===== */
+/* ===== MAIN CONTENT - Adjusts based on sidebar state ===== */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-left: 240px;
   background: var(--background);
   min-height: 100vh;
-  width: calc(100% - 240px);
+  width: 100%;
   overflow-x: hidden;
+  transition: margin-left 0.3s ease;
+  margin-left: 240px; /* Default when sidebar is open */
+}
+
+/* When sidebar is collapsed, adjust main content */
+.sidebar:not(.open) + .main-content {
+  margin-left: 70px; /* Matches collapsed sidebar width */
+  width: calc(100% - 70px);
 }
 
 /* Header */
@@ -303,6 +341,14 @@ h4 {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+}
+
+.text-btn.danger {
+  background: linear-gradient(135deg, var(--danger) 0%, #DC2626 100%);
+}
+
+.text-btn.danger:hover {
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 /* Status Messages - Auto dismiss */
@@ -1044,16 +1090,23 @@ h4 {
 
 /* Responsive Design */
 @media (max-width: 1024px) {
+  /* On mobile, sidebar overlays */
   .sidebar {
+    width: 280px;
     transform: translateX(-100%);
-    width: 260px;
   }
   
   .sidebar.open {
     transform: translateX(0);
   }
   
-  .main-content {
+  .sidebar.open + .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  /* On mobile, when sidebar is closed, no margin */
+  .sidebar:not(.open) + .main-content {
     margin-left: 0;
     width: 100%;
   }
@@ -1102,6 +1155,10 @@ h4 {
     width: 100%;
   }
   
+  .sidebar.open {
+    width: 100%;
+  }
+  
   .header h1 {
     font-size: 1.1rem;
   }
@@ -1129,4 +1186,34 @@ h4 {
   .dashboard, .data-page {
     padding: 0.75rem;
   }
+}
+/* Update the sidebar-nav styles */
+.sidebar-nav {
+  flex: 1;
+  padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  overflow-y: auto; /* Add this */
+  overflow-x: hidden; /* Add this */
+  align-items: stretch;
+  max-height: calc(100vh - 80px); /* Ensure it doesn't exceed viewport */
+}
+
+/* Optional: Add custom scrollbar for better UX */
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 2px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }

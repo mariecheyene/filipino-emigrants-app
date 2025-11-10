@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
   FiUpload, FiDownload, FiFileText, FiAlertCircle, 
-  FiDatabase, FiPlus, FiSave, FiEye, FiTrash2, 
-  FiEdit, FiX, FiSearch 
+  FiDatabase, FiPlus, FiSave, FiTrash2
 } from 'react-icons/fi';
 import { 
   importCSVData, 
   addDocument, 
-  deleteAllData,
-  getCollectionData 
+  deleteAllData
 } from '../services/emigrantsService';
 
 const CsvUploadPage = ({ 
@@ -19,9 +17,19 @@ const CsvUploadPage = ({
   const [selectedCollection, setSelectedCollection] = useState('civilStatus');
   const [manualEntry, setManualEntry] = useState({});
   const [loading, setLoading] = useState(false);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [viewData, setViewData] = useState([]);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
+  // Enhanced data types with proper collection names
+  const enhancedDataTypes = [
+    { value: 'civilStatus', label: 'Civil Status', icon: <FiFileText /> },
+    { value: 'sexData', label: 'Sex Data', icon: <FiFileText /> },
+    { value: 'ageData', label: 'Age Data', icon: <FiFileText /> },
+    { value: 'educationData', label: 'Education Data', icon: <FiFileText /> },
+    { value: 'occupationData', label: 'Occupation Data', icon: <FiFileText /> },
+    { value: 'placeOfOrigin', label: 'Place of Origin (Region)', icon: <FiFileText /> },
+    { value: 'placeOfOriginProvince', label: 'Place of Origin (Province)', icon: <FiFileText /> },
+    { value: 'allCountries', label: 'All Countries', icon: <FiFileText /> },
+    { value: 'majorCountries', label: 'Major Countries', icon: <FiFileText /> }
+  ];
 
   // Initialize manual entry form when collection changes
   useEffect(() => {
@@ -36,7 +44,7 @@ const CsvUploadPage = ({
     setManualEntry(initialData);
   }, [selectedCollection]);
 
-  // Mock function - replace with actual implementation
+  // Field templates based on your actual data structure
   const getCollectionFields = (collection) => {
     const fieldTemplates = {
       civilStatus: [
@@ -60,7 +68,7 @@ const CsvUploadPage = ({
       ],
       educationData: [
         { name: 'year', label: 'Year', type: 'number', required: true, min: 1981, max: 2020 },
-        { name: 'educationLevel', label: 'Education Level', type: 'text', required: true },
+        { name: 'educationAttainment', label: 'Education Attainment', type: 'text', required: true },
         { name: 'count', label: 'Count', type: 'number', required: true }
       ],
       occupationData: [
@@ -82,18 +90,153 @@ const CsvUploadPage = ({
         { name: 'year', label: 'Year', type: 'number', required: true, min: 1981, max: 2020 },
         { name: 'country', label: 'Country', type: 'text', required: true },
         { name: 'count', label: 'Count', type: 'number', required: true }
+      ],
+      majorCountries: [
+        { name: 'year', label: 'Year', type: 'number', required: true, min: 1981, max: 2020 },
+        { name: 'country', label: 'Country', type: 'text', required: true },
+        { name: 'count', label: 'Count', type: 'number', required: true }
       ]
     };
     return fieldTemplates[collection] || [];
   };
 
-  const DataStatusBadge = ({ count, label }) => (
-    <div className={`data-status-badge ${count > 0 ? 'has-data' : 'no-data'}`}>
-      <div className="status-indicator"></div>
-      <span className="status-label">{label}</span>
-      <span className="status-count">{count} records</span>
-    </div>
-  );
+  // FIXED CSV PARSER - Handles all formats
+  const transformCSVData = (text, dataType) => {
+    console.log('=== TRANSFORMING CSV FOR:', dataType);
+    
+    const lines = text.split('\n').filter(line => line.trim() !== '');
+    
+    if (lines.length < 2) {
+      throw new Error('CSV file is empty or has no data rows');
+    }
+
+    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+    console.log('Headers:', headers);
+
+    const transformedData = [];
+    
+    // SPECIAL CASE 1: sexData has YEAR, MALE, FEMALE columns
+    if (dataType === 'sexData') {
+      if (headers[0] === 'YEAR' && headers.includes('MALE') && headers.includes('FEMALE')) {
+        console.log('Processing sexData format...');
+        
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+          if (values.length >= 3) {
+            const year = values[0];
+            const male = values[1];
+            const female = values[2];
+            
+            if (year && !isNaN(year) && male !== '' && !isNaN(male) && female !== '' && !isNaN(female)) {
+              transformedData.push({
+                year: Number(year),
+                male: Number(male),
+                female: Number(female)
+              });
+            }
+          }
+        }
+      }
+    }
+    // SPECIAL CASE 2: civilStatus has YEAR and status columns
+    else if (dataType === 'civilStatus') {
+      // Check if it's the simple format (YEAR and status columns)
+      if (headers[0] === 'YEAR') {
+        console.log('Processing civilStatus simple format...');
+        
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+          const year = values[0];
+          
+          if (year && !isNaN(year)) {
+            const record = { year: Number(year) };
+            
+            // Add each status column - convert header names to lowercase
+            for (let j = 1; j < headers.length && j < values.length; j++) {
+              let status = headers[j].toLowerCase();
+              
+              // Handle special cases for field name mapping
+              if (status === 'not reported') {
+                status = 'notReported';
+              }
+              // Add other field name mappings if needed
+              
+              const count = values[j];
+              
+              if (count !== '' && !isNaN(count)) {
+                record[status] = Number(count);
+              }
+            }
+            
+            // Only add if we have at least one status field with data
+            if (Object.keys(record).length > 1) {
+              transformedData.push(record);
+            }
+          }
+        }
+      }
+    }
+    // SPECIAL CASE 3: Major Countries has YEAR as first column and countries as other columns
+    else if (dataType === 'majorCountries') {
+      if (headers[0] === 'YEAR') {
+        console.log('Processing majorCountries format...');
+        
+        const countryColumns = headers.slice(1);
+        console.log('Country columns:', countryColumns);
+        
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+          const year = values[0];
+          
+          for (let j = 1; j < countryColumns.length && j < values.length; j++) {
+            const country = countryColumns[j];
+            const count = values[j];
+            
+            if (year && !isNaN(year) && country && count !== '' && !isNaN(count)) {
+              transformedData.push({
+                year: Number(year),
+                country: country,
+                count: Number(count)
+              });
+            }
+          }
+        }
+      }
+    } 
+    // For all other data types (ageData, educationData, occupationData, allCountries, placeOfOrigin, etc.)
+    else {
+      console.log('Processing matrix format...');
+      
+      // Determine the category field name based on dataType
+      const categoryField = dataType === 'ageData' ? 'ageGroup' : 
+                          dataType === 'educationData' ? 'educationAttainment' :
+                          dataType === 'occupationData' ? 'occupation' :
+                          dataType === 'placeOfOrigin' ? 'region' :
+                          dataType === 'placeOfOriginProvince' ? 'province' :
+                          'country';
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+        const category = values[0];
+        
+        for (let j = 1; j < headers.length && j < values.length; j++) {
+          const year = headers[j];
+          const count = values[j];
+          
+          if (year && !isNaN(year) && category && count !== '' && !isNaN(count)) {
+            transformedData.push({
+              year: Number(year),
+              [categoryField]: category,
+              count: Number(count)
+            });
+          }
+        }
+      }
+    }
+    
+    console.log(`Transformed ${transformedData.length} records for ${dataType}`, transformedData.slice(0, 3));
+    return transformedData;
+  };
 
   const handleFileUpload = async (event, dataType) => {
     const file = event.target.files[0];
@@ -103,26 +246,24 @@ const CsvUploadPage = ({
     setUploadStatus(`📤 Uploading ${dataType} data...`);
 
     try {
-      // Read CSV file
       const text = await file.text();
-      const lines = text.split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
+      console.log('=== RAW CSV TEXT ===');
+      console.log(text.substring(0, 500) + '...');
       
-      // Convert to JSON
-      const jsonData = lines.slice(1).map(line => {
-        const values = line.split(',').map(v => v.trim());
-        const item = {};
-        headers.forEach((header, index) => {
-          item[header] = values[index] || '';
-        });
-        return item;
-      }).filter(item => Object.values(item).some(val => val !== ''));
+      const jsonData = transformCSVData(text, dataType);
+
+      if (jsonData.length === 0) {
+        throw new Error('No valid data found in CSV file after transformation');
+      }
+
+      console.log(`📊 FINAL DATA TO UPLOAD:`, jsonData.slice(0, 3));
 
       // Import to Firebase
       await importCSVData(jsonData, dataType);
       setUploadStatus(`✅ ${jsonData.length} records uploaded to ${dataType}`);
       
     } catch (error) {
+      console.error('Upload error:', error);
       setUploadStatus(`❌ Upload failed: ${error.message}`);
     } finally {
       setLoading(false);
@@ -174,112 +315,13 @@ const CsvUploadPage = ({
     }
   };
 
-  const handleViewExistingData = async () => {
-    setLoading(true);
-    try {
-      const allData = await getCollectionData(selectedCollection);
-      // Filter by selected year
-      const filteredData = allData.filter(item => item.year == selectedYear);
-      setViewData(filteredData);
-      setShowViewModal(true);
-    } catch (error) {
-      setUploadStatus(`❌ Error loading data: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const ViewDataModal = () => {
-    if (!showViewModal) return null;
-
-    const fields = getCollectionFields(selectedCollection);
-    
-    return (
-      <div className="modal-overlay">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h3>
-              <FiEye />
-              View Data - {dataTypes.find(d => d.value === selectedCollection)?.label}
-            </h3>
-            <button className="close-btn" onClick={() => setShowViewModal(false)}>
-              <FiX />
-            </button>
-          </div>
-          
-          <div className="modal-body">
-            <div className="filter-section">
-              <label>Filter by Year:</label>
-              <select 
-                value={selectedYear} 
-                onChange={(e) => setSelectedYear(e.target.value)}
-              >
-                {Array.from({length: 40}, (_, i) => 1981 + i).map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-              <button 
-                className="primary-btn"
-                onClick={handleViewExistingData}
-                disabled={loading}
-              >
-                <FiSearch />
-                {loading ? 'Loading...' : 'Apply Filter'}
-              </button>
-            </div>
-
-            <div className="data-table-container">
-              {viewData.length === 0 ? (
-                <div className="no-data">
-                  <FiAlertCircle />
-                  <p>No records found for {selectedYear}</p>
-                </div>
-              ) : (
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      {fields.map(field => (
-                        <th key={field.name}>{field.label}</th>
-                      ))}
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {viewData.map((item, index) => (
-                      <tr key={item.id || index}>
-                        {fields.map(field => (
-                          <td key={field.name}>
-                            {item[field.name]}
-                          </td>
-                        ))}
-                        <td className="actions">
-                          <button className="edit-btn">
-                            <FiEdit />
-                          </button>
-                          <button className="delete-btn">
-                            <FiTrash2 />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </div>
-          
-          <div className="modal-footer">
-            <button 
-              className="secondary-btn"
-              onClick={() => setShowViewModal(false)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  const DataStatusBadge = ({ count, label }) => (
+    <div className={`data-status-badge ${count > 0 ? 'has-data' : 'no-data'}`}>
+      <div className="status-indicator"></div>
+      <span className="status-label">{label}</span>
+      <span className="status-count">{count} records</span>
+    </div>
+  );
 
   return (
     <div className="data-page">
@@ -295,7 +337,7 @@ const CsvUploadPage = ({
           <span style={{ color: '#10B981', marginLeft: 'auto' }}>✅ Connected</span>
         </div>
         <div className="status-grid">
-          {dataTypes.map(dataType => (
+          {enhancedDataTypes.map(dataType => (
             <DataStatusBadge
               key={dataType.value}
               count={dataStats[dataType.value] || 0}
@@ -312,7 +354,7 @@ const CsvUploadPage = ({
           <p>Upload CSV files to update Firebase collections</p>
           
           <div className="upload-grid">
-            {dataTypes.map((dataType) => (
+            {enhancedDataTypes.map((dataType) => (
               <div key={dataType.value} className="upload-card">
                 <div className="upload-card-header">
                   <div className="upload-icon">{dataType.icon}</div>
@@ -357,7 +399,7 @@ const CsvUploadPage = ({
               value={selectedCollection}
               onChange={(e) => setSelectedCollection(e.target.value)}
             >
-              {dataTypes.map(type => (
+              {enhancedDataTypes.map(type => (
                 <option key={type.value} value={type.value}>
                   {type.label}
                 </option>
@@ -373,38 +415,19 @@ const CsvUploadPage = ({
                     {field.label}
                     {field.required && <span className="required">*</span>}
                   </label>
-                  
-                  {field.type === 'select' ? (
-                    <select
-                      value={manualEntry[field.name] || ''}
-                      onChange={(e) => setManualEntry({
-                        ...manualEntry,
-                        [field.name]: e.target.value
-                      })}
-                      required={field.required}
-                    >
-                      <option value="">Select {field.label}</option>
-                      {field.options.map(option => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      type={field.type}
-                      value={manualEntry[field.name] || ''}
-                      onChange={(e) => setManualEntry({
-                        ...manualEntry,
-                        [field.name]: field.type === 'number' 
-                          ? parseInt(e.target.value) || 0 
-                          : e.target.value
-                      })}
-                      min={field.min}
-                      max={field.max}
-                      required={field.required}
-                    />
-                  )}
+                  <input
+                    type={field.type}
+                    value={manualEntry[field.name] || ''}
+                    onChange={(e) => setManualEntry({
+                      ...manualEntry,
+                      [field.name]: field.type === 'number' 
+                        ? parseInt(e.target.value) || 0 
+                        : e.target.value
+                    })}
+                    min={field.min}
+                    max={field.max}
+                    required={field.required}
+                  />
                 </div>
               ))}
             </div>
@@ -418,21 +441,10 @@ const CsvUploadPage = ({
                 <FiSave />
                 {loading ? 'Adding...' : 'Add Record'}
               </button>
-              <button 
-                type="button" 
-                className="secondary-btn"
-                onClick={handleViewExistingData}
-                disabled={loading}
-              >
-                <FiEye />
-                View Existing Data
-              </button>
             </div>
           </form>
         </div>
       </div>
-
-      <ViewDataModal />
     </div>
   );
 };

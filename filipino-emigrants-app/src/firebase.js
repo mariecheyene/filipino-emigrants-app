@@ -2,14 +2,15 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBx6BJsOAG8j-vs-jy2JKRiFudwZss0nXg",
-  authDomain: "filipinoemigrantsdb-7e441.firebaseapp.com",
-  projectId: "filipinoemigrantsdb-7e441",
-  storageBucket: "filipinoemigrantsdb-7e441.firebasestorage.app",
-  messagingSenderId: "651613037376",
-  appId: "1:651613037376:web:69c9d13b1be73e2b4d10a5",
-  measurementId: "G-N700QDP6KH"
+  apiKey: "AIzaSyCeVDWP7Ec0wkWDXq_prTCsPb6k5NLcK8I",
+  authDomain: "filipinoemigrantsdb3.firebaseapp.com",
+  projectId: "filipinoemigrantsdb3",
+  storageBucket: "filipinoemigrantsdb3.firebasestorage.app",
+  messagingSenderId: "11501678602",
+  appId: "1:11501678602:web:1c766f03109e187c836ff3"
 };
+
+
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);

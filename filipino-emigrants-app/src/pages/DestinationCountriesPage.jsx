@@ -1,14 +1,65 @@
 import React, { useMemo, useState } from 'react';
 import { 
   FiGlobe, FiAlertCircle, FiPieChart, FiBarChart2,
-  FiMaximize, FiMinimize, FiTrendingUp
+  FiMaximize, FiMinimize, FiTrendingUp, FiMap
 } from 'react-icons/fi';
 import { 
   BarChart, Bar, PieChart, Pie, LineChart, Line,
   XAxis, YAxis, Tooltip, CartesianGrid, 
   ResponsiveContainer, Cell, Legend
 } from 'recharts';
+import { ComposableMap, Geographies, Geography } from "react-simple-maps";
+import { scaleLinear } from "d3-scale";
 import "../css/DestinationCountriesPage.css";
+
+// Custom Tooltip Component for better clarity
+const DestinationTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="destination-tooltip">
+        <p className="destination-tooltip-label">{`Country: ${label}`}</p>
+        {payload.map((entry, index) => (
+          <p key={index} className="destination-tooltip-item">
+            <span 
+              className="destination-tooltip-color" 
+              style={{ backgroundColor: entry.color }}
+            ></span>
+            {`${entry.name}: ${entry.value?.toLocaleString() || '0'} emigrants`}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
+// Custom Pie Chart Label Component to handle small percentages
+const CustomPieLabel = ({
+  cx, cy, midAngle, innerRadius, outerRadius, percent, index, name
+}) => {
+  if (percent < 0.03) {
+    return null;
+  }
+
+  const RADIAN = Math.PI / 180;
+  const radius = outerRadius + 20;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text 
+      x={x} 
+      y={y} 
+      fill="#374151"
+      textAnchor={x > cx ? 'start' : 'end'} 
+      dominantBaseline="central"
+      fontSize={12}
+      fontWeight="600"
+    >
+      {`${(percent * 100).toFixed(1)}%`}
+    </text>
+  );
+};
 
 // Individual Chart Components with React.memo
 const TopCountriesBarChart = React.memo(({ data, selectedYear, onYearChange, onFullscreen }) => {
@@ -51,7 +102,7 @@ const TopCountriesBarChart = React.memo(({ data, selectedYear, onYearChange, onF
   }, [data]);
 
   const YearDropdownFilter = () => (
-    <div className="chart-filter">
+    <div className="destination-chart-filter">
       <label>Year:</label>
       <select 
         value={selectedYear} 
@@ -76,22 +127,22 @@ const TopCountriesBarChart = React.memo(({ data, selectedYear, onYearChange, onF
       filters={<YearDropdownFilter />}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData}>
+        <BarChart 
+          data={chartData}
+          margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+        >
           <CartesianGrid strokeDasharray="3 3" stroke="#444" />
           <XAxis 
             dataKey="country" 
             stroke="#ccc" 
             angle={-45} 
             textAnchor="end" 
-            height={80} 
+            height={60}
             interval={0}
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 11 }}
           />
           <YAxis stroke="#ccc" />
-          <Tooltip 
-            formatter={(value) => [value.toLocaleString(), 'Emigrants']}
-            labelFormatter={(label) => `Country: ${label}`}
-          />
+          <Tooltip content={<DestinationTooltip />} />
           <Bar 
             dataKey="count" 
             radius={[4, 4, 0, 0]}
@@ -156,9 +207,9 @@ const MultiLineTrendChart = React.memo(({ data, yearRange, onYearRangeChange, co
   }, [data, yearRange, countryCount]);
 
   const YearRangeFilter = () => (
-    <div className="chart-filter">
+    <div className="destination-chart-filter">
       <label>Year Range:</label>
-      <div className="range-inputs">
+      <div className="destination-range-inputs">
         <input
           type="number"
           value={yearRange[0]}
@@ -179,7 +230,7 @@ const MultiLineTrendChart = React.memo(({ data, yearRange, onYearRangeChange, co
   );
 
   const CountryCountFilter = () => (
-    <div className="chart-filter">
+    <div className="destination-chart-filter">
       <label>Show Top:</label>
       <select 
         value={countryCount} 
@@ -214,7 +265,7 @@ const MultiLineTrendChart = React.memo(({ data, yearRange, onYearRangeChange, co
       className="full-width"
       onFullscreen={onFullscreen}
       filters={
-        <div className="chart-filters-group">
+        <div className="destination-chart-filters-group">
           <YearRangeFilter />
           <CountryCountFilter />
         </div>
@@ -230,10 +281,7 @@ const MultiLineTrendChart = React.memo(({ data, yearRange, onYearRangeChange, co
               tick={{ fontSize: 12 }}
             />
             <YAxis stroke="#ccc" />
-            <Tooltip 
-              formatter={(value) => [value.toLocaleString(), 'Emigrants']}
-              labelFormatter={(label) => `Year: ${label}`}
-            />
+            <Tooltip content={<DestinationTooltip />} />
             <Legend />
             {countriesInChart.map((country, index) => (
               <Line 
@@ -249,7 +297,7 @@ const MultiLineTrendChart = React.memo(({ data, yearRange, onYearRangeChange, co
             ))}
           </LineChart>
         ) : (
-          <div className="no-data-message">
+          <div className="destination-no-data-message">
             No trend data available for the selected filters.
           </div>
         )}
@@ -287,11 +335,12 @@ const CountryCompositionPieChart = React.memo(({ data, selectedYear, onYearChang
     // Convert to array and calculate percentages
     return Object.entries(countries)
       .map(([country, count]) => ({ 
-        name: country, // Changed from 'country' to 'name' for Recharts compatibility
-        value: count,   // Changed from 'count' to 'value' for Recharts compatibility
+        name: country,
+        value: count,
         percentage: totalCount > 0 ? (count / totalCount * 100) : 0
       }))
-      .sort((a, b) => b.value - a.value);
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 8);
   }, [data, selectedYear]);
 
   const yearOptions = useMemo(() => {
@@ -305,7 +354,7 @@ const CountryCompositionPieChart = React.memo(({ data, selectedYear, onYearChang
   }, [data]);
 
   const YearDropdownFilter = () => (
-    <div className="chart-filter">
+    <div className="destination-chart-filter">
       <label>Year:</label>
       <select 
         value={selectedYear} 
@@ -320,7 +369,23 @@ const CountryCompositionPieChart = React.memo(({ data, selectedYear, onYearChang
     </div>
   );
 
-  const COLORS = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#7ED321', '#B8E986', '#9013FE', '#417505', '#FF6B6B', '#4ECDC4'];
+  const COLORS = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#7ED321', '#B8E986', '#9013FE', '#417505'];
+
+  const CustomPieLegend = () => (
+    <div className="destination-pie-legend">
+      {chartData.map((entry, index) => (
+        <div key={`legend-${index}`} className="destination-legend-item">
+          <div 
+            className="destination-legend-color" 
+            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+          ></div>
+          <span className="destination-legend-text">
+            {entry.name}: {entry.percentage.toFixed(1)}%
+          </span>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <ChartContainer 
@@ -328,48 +393,371 @@ const CountryCompositionPieChart = React.memo(({ data, selectedYear, onYearChang
       icon={<FiPieChart />}
       onFullscreen={onFullscreen}
       filters={<YearDropdownFilter />}
+      className="destination-composition-card"
     >
-      <ResponsiveContainer width="100%" height="100%">
+      <div className="destination-chart-content destination-composition-content">
         {chartData.length > 0 ? (
-          <PieChart>
-            <Pie
-              data={chartData.slice(0, 8)}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={100}
-              paddingAngle={2}
-              dataKey="value" // Changed to 'value'
-              nameKey="name"  // Added nameKey for proper legend labels
-              label={({ name, percentage }) => `${name}: ${percentage.toFixed(1)}%`}
-              labelLine={true}
-            >
-              {chartData.slice(0, 8).map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip 
-              formatter={(value, name, props) => [
-                `${value.toLocaleString()} (${props.payload.percentage.toFixed(1)}%)`, 
-                'Emigrants'
-              ]}
-              labelFormatter={(label) => `Country: ${label}`}
-            />
-            <Legend 
-              formatter={(value, entry, index) => (
-                <span style={{ color: '#ccc', fontSize: '12px' }}>
-                  {chartData[index]?.name || value}
-                </span>
-              )}
-            />
-          </PieChart>
+          <div className="destination-pie-container">
+            <div className="destination-pie-chart-wrapper">
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={CustomPieLabel}
+                    outerRadius={100}
+                    innerRadius={50}
+                    fill="#8884d8"
+                    dataKey="value"
+                    paddingAngle={2}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={COLORS[index % COLORS.length]} 
+                        stroke="#fff"
+                        strokeWidth={2}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value, name) => [
+                      `${value?.toLocaleString() || '0'} emigrants (${chartData.find(item => item.name === name)?.percentage?.toFixed(1) || 0}%)`, 
+                      name
+                    ]} 
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="destination-legend-container">
+              <CustomPieLegend />
+            </div>
+          </div>
         ) : (
-          <div className="no-data-message">
+          <div className="destination-no-data-message">
             No composition data available for the selected year.
           </div>
         )}
-      </ResponsiveContainer>
+      </div>
     </ChartContainer>
+  );
+});
+
+
+// Choropleth Map Component
+const ChoroplethMap = React.memo(({ data, selectedYear, onYearChange, onFullscreen }) => {
+  const [tooltip, setTooltip] = useState(null);
+  const [hoveredCountry, setHoveredCountry] = useState(null);
+
+  const mapData = useMemo(() => {
+    if (!data?.length) return [];
+
+    let filteredData = [];
+    
+    if (selectedYear === 'all') {
+      filteredData = data;
+    } else {
+      filteredData = data.filter(item => item.year === selectedYear);
+    }
+
+    if (!filteredData.length) return [];
+    
+    const countries = {};
+    filteredData.forEach(item => {
+      const country = item.country || 'Unknown';
+      const count = Number(item.count) || Number(item.total) || 0;
+      if (country && country !== 'Unknown') {
+        countries[country] = (countries[country] || 0) + count;
+      }
+    });
+
+    return Object.entries(countries)
+      .map(([country, count]) => ({ country, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [data, selectedYear]);
+
+  const yearOptions = useMemo(() => {
+    if (!data?.length) return [{ value: 'all', label: 'All Years' }];
+    
+    const years = [...new Set(data.map(item => item.year).filter(Boolean))].sort();
+    return [
+      { value: 'all', label: 'All Years' },
+      ...years.map(year => ({ value: year, label: year.toString() }))
+    ];
+  }, [data]);
+
+  const YearDropdownFilter = () => (
+    <div className="destination-chart-filter">
+      <label>Year:</label>
+      <select 
+        value={selectedYear} 
+        onChange={(e) => onYearChange(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
+      >
+        {yearOptions.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
+  // Country name mapping for better matching
+  const countryNameMapping = {
+    'UNITED STATES': 'United States',
+    'USA': 'United States',
+    'US': 'United States',
+    'CANADA': 'Canada',
+    'JAPAN': 'Japan',
+    'AUSTRALIA': 'Australia',
+    'UNITED KINGDOM': 'United Kingdom',
+    'UK': 'United Kingdom',
+    'GERMANY': 'Germany',
+    'FRANCE': 'France',
+    'ITALY': 'Italy',
+    'SPAIN': 'Spain',
+    'SOUTH KOREA': 'South Korea',
+    'KOREA': 'South Korea',
+    'SINGAPORE': 'Singapore',
+    'MALAYSIA': 'Malaysia',
+    'UAE': 'United Arab Emirates',
+    'UNITED ARAB EMIRATES': 'United Arab Emirates',
+    'SAUDI ARABIA': 'Saudi Arabia',
+    'QATAR': 'Qatar',
+    'KUWAIT': 'Kuwait',
+    'NEW ZEALAND': 'New Zealand',
+  };
+
+  const getStandardCountryName = (countryName) => {
+    return countryNameMapping[countryName.toUpperCase()] || countryName;
+  };
+
+  // ENHANCED COLOR SCALE - Solution 1
+  const maxEmigrants = Math.max(...mapData.map(d => d.count), 1);
+  const colorScale = scaleLinear()
+    .domain([
+      0, 
+      maxEmigrants * 0.1, 
+      maxEmigrants * 0.3, 
+      maxEmigrants * 0.6, 
+      maxEmigrants
+    ])
+    .range([
+      "#E8F4F8",  // Very light blue for low values
+      "#4A90E2",  // Medium blue
+      "#1E7FB8",  // Strong blue
+      "#0F4C75",  // Dark blue
+      "#002B49"   // Very dark blue for highest values
+    ]);
+
+  // Handle mouse events for tooltip
+  const handleMouseEnter = (geo, event) => {
+    const countryName = geo.properties.name;
+    const countryData = mapData.find(d => 
+      getStandardCountryName(d.country).toLowerCase() === countryName.toLowerCase() ||
+      d.country.toLowerCase() === countryName.toLowerCase()
+    );
+    
+    if (countryData) {
+      setHoveredCountry(countryName);
+      setTooltip({
+        country: getStandardCountryName(countryData.country),
+        count: countryData.count,
+        x: event.clientX,
+        y: event.clientY
+      });
+    } else {
+      setTooltip({
+        country: countryName,
+        count: 0,
+        x: event.clientX,
+        y: event.clientY
+      });
+    }
+  };
+
+  const handleMouseMove = (event) => {
+    if (tooltip) {
+      setTooltip(prev => ({
+        ...prev,
+        x: event.clientX,
+        y: event.clientY
+      }));
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setTooltip(null);
+    setHoveredCountry(null);
+  };
+
+  return (
+    <div className="destination-map-card">
+      <div className="destination-chart-header">
+        <div className="destination-chart-title">
+          <span className="destination-chart-icon"><FiMap /></span>
+          <h4>Emigrants Distribution Map</h4>
+        </div>
+        <div className="destination-chart-controls">
+          <YearDropdownFilter />
+          <button 
+            className="destination-fullscreen-btn"
+            onClick={onFullscreen}
+            title="Toggle fullscreen"
+          >
+            <FiMaximize />
+          </button>
+        </div>
+      </div>
+      <div className="destination-chart-content">
+        <div className="destination-choropleth-map">
+          {mapData.length > 0 ? (
+            <>
+              {/* Tooltip */}
+              {tooltip && (
+                <div 
+                  className="destination-map-tooltip"
+                  style={{
+                    left: tooltip.x + 10,
+                    top: tooltip.y - 10,
+                  }}
+                >
+                  <div className="destination-map-tooltip-country">
+                    {tooltip.country}
+                  </div>
+                  <div className="destination-map-tooltip-count">
+                    {tooltip.count.toLocaleString()} emigrants
+                  </div>
+                </div>
+              )}
+
+              {/* BIG CONTAINER WITH MAP ON LEFT, INFO ON RIGHT */}
+              <div className="destination-map-main-container">
+                
+                {/* LEFT SIDE: BIG MAP VISUALIZATION */}
+                <div className="destination-map-visualization">
+                  <ComposableMap 
+                    projectionConfig={{ 
+                      scale: 140,
+                      rotation: [0, 0, 0] 
+                    }}
+                  >
+                    <Geographies geography="https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json">
+                      {({ geographies }) =>
+                        geographies.map((geo) => {
+                          const countryName = geo.properties.name;
+                          const countryData = mapData.find(d => 
+                            getStandardCountryName(d.country).toLowerCase() === countryName.toLowerCase() ||
+                            d.country.toLowerCase() === countryName.toLowerCase()
+                          );
+                          
+                          // Get color based on data
+                          const color = countryData
+                            ? colorScale(countryData.count)
+                            : "#E0E0E0"; // Gray for no data
+                          
+                          const isHovered = hoveredCountry === countryName;
+                          
+                          return (
+                            <Geography
+                              key={geo.rsmKey}
+                              geography={geo}
+                              fill={color}
+                              // ENHANCED BORDERS - Solution 2
+                              stroke={countryData ? "#2D3748" : "#CBD5E0"} // Darker borders for countries with data
+                              strokeWidth={countryData ? 1 : 0.5} // Thicker borders for countries with data
+                              style={{
+                                default: { 
+                                  outline: "none",
+                                  cursor: "pointer",
+                                  transition: "all 0.2s ease"
+                                },
+                                hover: { 
+                                  fill: isHovered ? "#E53E3E" : color, // Red hover for better visibility
+                                  outline: "none",
+                                  cursor: "pointer",
+                                  strokeWidth: 2,
+                                  stroke: "#E53E3E"
+                                },
+                                pressed: { outline: "none" },
+                              }}
+                              onMouseEnter={(event) => handleMouseEnter(geo, event)}
+                              onMouseMove={handleMouseMove}
+                              onMouseLeave={handleMouseLeave}
+                            />
+                          );
+                        })
+                      }
+                    </Geographies>
+                  </ComposableMap>
+                </div>
+
+                {/* RIGHT SIDE: LEGEND AND TOP COUNTRIES */}
+                <div className="destination-map-info-sidebar">
+                  
+                  {/* ENHANCED LEGEND */}
+                  <div className="destination-map-legend-container">
+                    <h5 className="destination-map-legend-title">Number of Filipino Emigrants</h5>
+                    <p className="destination-map-legend-subtitle">
+                      Darker blue = More emigrants<br />
+                      Lighter blue = Fewer emigrants<br />
+                      Gray = No data available
+                    </p>
+                    <div className="destination-map-legend">
+                      <div className="destination-map-legend-colors">
+                        {["#E8F4F8", "#4A90E2", "#1E7FB8", "#0F4C75", "#002B49"].map((color, index) => (
+                          <div 
+                            key={index}
+                            className="destination-map-legend-color"
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
+                      </div>
+                      <div className="destination-map-legend-labels">
+                        <span className="destination-map-legend-label destination-map-legend-min">Fewer</span>
+                        <span className="destination-map-legend-label destination-map-legend-max">More</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* TOP 5 COUNTRIES LIST */}
+                  <div className="destination-top-countries">
+                    <div className="destination-top-countries-header">
+                      <h5>Top 5 Destination Countries</h5>
+                    </div>
+                    <div className="destination-top-countries-list">
+                      {mapData.slice(0, 5).map(({ country, count }, index) => (
+                        <div 
+                          key={country} 
+                          className={`destination-top-country-item rank-${index + 1}`}
+                        >
+                          <div className="destination-top-country-rank">
+                            {index + 1}
+                          </div>
+                          <span className="destination-top-country-name">
+                            {getStandardCountryName(country)}
+                          </span>
+                          <span className="destination-top-country-count">
+                            {count.toLocaleString()}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="destination-no-data-message">
+              No map data available for the selected year.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 });
 
@@ -382,16 +770,16 @@ const ChartContainer = React.memo(({
   onFullscreen,
   filters 
 }) => (
-  <div className={`chart-card ${className}`}>
-    <div className="chart-header">
-      <div className="chart-title">
-        {icon && <span className="chart-icon">{icon}</span>}
+  <div className={`destination-chart-card ${className}`}>
+    <div className="destination-chart-header">
+      <div className="destination-chart-title">
+        {icon && <span className="destination-chart-icon">{icon}</span>}
         <h4>{title}</h4>
       </div>
-      <div className="chart-controls">
+      <div className="destination-chart-controls">
         {filters}
         <button 
-          className="fullscreen-btn"
+          className="destination-fullscreen-btn"
           onClick={onFullscreen}
           title="Toggle fullscreen"
         >
@@ -399,7 +787,7 @@ const ChartContainer = React.memo(({
         </button>
       </div>
     </div>
-    <div className="chart-content">
+    <div className="destination-chart-content">
       {children}
     </div>
   </div>
@@ -451,7 +839,7 @@ const FullScreenBarChart = React.memo(({ data, selectedYear }) => {
           tick={{ fontSize: 14 }}
         />
         <YAxis stroke="#ccc" />
-        <Tooltip formatter={(value) => [value.toLocaleString(), 'Emigrants']} />
+        <Tooltip content={<DestinationTooltip />} />
         <Legend />
         <Bar 
           dataKey="count" 
@@ -532,7 +920,7 @@ const FullScreenMultiLineChart = React.memo(({ data, yearRange, countryCount }) 
         <CartesianGrid strokeDasharray="3 3" stroke="#444" />
         <XAxis dataKey="year" stroke="#ccc" />
         <YAxis stroke="#ccc" />
-        <Tooltip formatter={(value) => [value.toLocaleString(), 'Emigrants']} />
+        <Tooltip content={<DestinationTooltip />} />
         <Legend />
         {countriesInChart.map((country, index) => (
           <Line 
@@ -579,8 +967,8 @@ const FullScreenPieChart = React.memo(({ data, selectedYear }) => {
 
     return Object.entries(countries)
       .map(([country, count]) => ({ 
-        name: country, // Changed from 'country' to 'name'
-        value: count,   // Changed from 'count' to 'value'
+        name: country,
+        value: count,
         percentage: totalCount > 0 ? (count / totalCount * 100) : 0
       }))
       .sort((a, b) => b.value - a.value)
@@ -589,40 +977,300 @@ const FullScreenPieChart = React.memo(({ data, selectedYear }) => {
 
   const COLORS = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#7ED321', '#B8E986', '#9013FE', '#417505', '#FF6B6B', '#4ECDC4'];
 
+  const FullScreenPieLabel = ({
+    cx, cy, midAngle, innerRadius, outerRadius, percent, index, name
+  }) => {
+    if (percent < 0.03) {
+      return null;
+    }
+
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius + 40;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="#374151"
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        fontSize={14}
+        fontWeight="600"
+      >
+        {`${(percent * 100).toFixed(1)}%`}
+      </text>
+    );
+  };
+
+  const FullScreenPieLegend = () => (
+    <div className="destination-pie-legend destination-fullscreen-legend">
+      {chartData.map((entry, index) => (
+        <div key={`item-${index}`} className="destination-legend-item">
+          <div 
+            className="destination-legend-color" 
+            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+          ></div>
+          <span className="destination-legend-text">
+            {entry.name}: {entry.percentage.toFixed(1)}%
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
-    <ResponsiveContainer width="100%" height="90%">
-      <PieChart>
-        <Pie
-          data={chartData}
-          cx="50%"
-          cy="50%"
-          innerRadius={80}
-          outerRadius={140}
-          paddingAngle={2}
-          dataKey="value" // Changed to 'value'
-          nameKey="name"  // Added nameKey for proper legend labels
-          label={({ name, percentage }) => `${name}: ${percentage.toFixed(1)}%`}
-          labelLine={true}
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, minHeight: 0, padding: '30px' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={FullScreenPieLabel}
+              outerRadius={140}
+              innerRadius={60}
+              fill="#8884d8"
+              dataKey="value"
+              paddingAngle={2}
+            >
+              {chartData.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={COLORS[index % COLORS.length]} 
+                  stroke="#fff"
+                  strokeWidth={2}
+                />
+              ))}
+            </Pie>
+            <Tooltip 
+              formatter={(value, name) => [
+                `${value?.toLocaleString() || '0'} emigrants (${chartData.find(item => item.name === name)?.percentage?.toFixed(1) || 0}%)`, 
+                name
+              ]} 
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="destination-legend-container destination-fullscreen-legend-container">
+        <FullScreenPieLegend />
+      </div>
+    </div>
+  );
+});
+
+// Full Screen Map Component
+const FullScreenMap = React.memo(({ data, selectedYear }) => {
+  const [tooltip, setTooltip] = useState(null);
+  const [hoveredCountry, setHoveredCountry] = useState(null);
+
+  const mapData = useMemo(() => {
+    if (!data?.length) return [];
+
+    let filteredData = [];
+    
+    if (selectedYear === 'all') {
+      filteredData = data;
+    } else {
+      filteredData = data.filter(item => item.year === selectedYear);
+    }
+
+    if (!filteredData.length) return [];
+    
+    const countries = {};
+    filteredData.forEach(item => {
+      const country = item.country || 'Unknown';
+      const count = Number(item.count) || Number(item.total) || 0;
+      if (country && country !== 'Unknown') {
+        countries[country] = (countries[country] || 0) + count;
+      }
+    });
+
+    return Object.entries(countries)
+      .map(([country, count]) => ({ country, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [data, selectedYear]);
+
+  // Country name mapping
+  const countryNameMapping = {
+    'UNITED STATES': 'United States',
+    'USA': 'United States',
+    'US': 'United States',
+    'CANADA': 'Canada',
+    'JAPAN': 'Japan',
+    'AUSTRALIA': 'Australia',
+    'UNITED KINGDOM': 'United Kingdom',
+    'UK': 'United Kingdom',
+    'GERMANY': 'Germany',
+    'FRANCE': 'France',
+    'ITALY': 'Italy',
+    'SPAIN': 'Spain',
+    'SOUTH KOREA': 'South Korea',
+    'KOREA': 'South Korea',
+    'SINGAPORE': 'Singapore',
+    'MALAYSIA': 'Malaysia',
+    'UAE': 'United Arab Emirates',
+    'UNITED ARAB EMIRATES': 'United Arab Emirates',
+    'SAUDI ARABIA': 'Saudi Arabia',
+    'QATAR': 'Qatar',
+    'KUWAIT': 'Kuwait',
+    'NEW ZEALAND': 'New Zealand',
+  };
+
+  const getStandardCountryName = (countryName) => {
+    return countryNameMapping[countryName.toUpperCase()] || countryName;
+  };
+
+  // ENHANCED COLOR SCALE - Solution 1
+  const maxEmigrants = Math.max(...mapData.map(d => d.count), 1);
+  const colorScale = scaleLinear()
+    .domain([
+      0, 
+      maxEmigrants * 0.1, 
+      maxEmigrants * 0.3, 
+      maxEmigrants * 0.6, 
+      maxEmigrants
+    ])
+    .range([
+      "#E8F4F8",  // Very light blue for low values
+      "#4A90E2",  // Medium blue
+      "#1E7FB8",  // Strong blue
+      "#0F4C75",  // Dark blue
+      "#002B49"   // Very dark blue for highest values
+    ]);
+
+  // Handle mouse events for tooltip
+  const handleMouseEnter = (geo, event) => {
+    const countryName = geo.properties.name;
+    const countryData = mapData.find(d => 
+      getStandardCountryName(d.country).toLowerCase() === countryName.toLowerCase() ||
+      d.country.toLowerCase() === countryName.toLowerCase()
+    );
+    
+    if (countryData) {
+      setHoveredCountry(countryName);
+      setTooltip({
+        country: getStandardCountryName(countryData.country),
+        count: countryData.count,
+        x: event.clientX,
+        y: event.clientY
+      });
+    } else {
+      setTooltip({
+        country: countryName,
+        count: 0,
+        x: event.clientX,
+        y: event.clientY
+      });
+    }
+  };
+
+  const handleMouseMove = (event) => {
+    if (tooltip) {
+      setTooltip(prev => ({
+        ...prev,
+        x: event.clientX,
+        y: event.clientY
+      }));
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setTooltip(null);
+    setHoveredCountry(null);
+  };
+
+  return (
+    <div className="destination-fullscreen-choropleth-map">
+      {/* Tooltip */}
+      {tooltip && (
+        <div 
+          className="destination-map-tooltip"
+          style={{
+            left: tooltip.x + 10,
+            top: tooltip.y - 10,
+          }}
         >
-          {chartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          <div className="destination-map-tooltip-country">
+            {tooltip.country}
+          </div>
+          <div className="destination-map-tooltip-count">
+            {tooltip.count.toLocaleString()} emigrants
+          </div>
+        </div>
+      )}
+
+      <ComposableMap 
+        projectionConfig={{ 
+          scale: 180,
+          rotation: [0, 0, 0] 
+        }}
+      >
+        <Geographies geography="https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json">
+          {({ geographies }) =>
+            geographies.map((geo) => {
+              const countryName = geo.properties.name;
+              const countryData = mapData.find(d => 
+                getStandardCountryName(d.country).toLowerCase() === countryName.toLowerCase() ||
+                d.country.toLowerCase() === countryName.toLowerCase()
+              );
+              const color = countryData
+                ? colorScale(countryData.count)
+                : "#E0E0E0";
+              
+              const isHovered = hoveredCountry === countryName;
+              
+              return (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill={color}
+                  // ENHANCED BORDERS - Solution 2
+                  stroke={countryData ? "#2D3748" : "#CBD5E0"}
+                  strokeWidth={countryData ? 1 : 0.5}
+                  style={{
+                    default: { 
+                      outline: "none",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease"
+                    },
+                    hover: { 
+                      fill: isHovered ? "#E53E3E" : color,
+                      outline: "none",
+                      cursor: "pointer",
+                      strokeWidth: 2,
+                      stroke: "#E53E3E"
+                    },
+                    pressed: { outline: "none" },
+                  }}
+                  onMouseEnter={(event) => handleMouseEnter(geo, event)}
+                  onMouseMove={handleMouseMove}
+                  onMouseLeave={handleMouseLeave}
+                />
+              );
+            })
+          }
+        </Geographies>
+      </ComposableMap>
+      
+      {/* Enhanced Legend */}
+      <div className="destination-fullscreen-map-legend">
+        <span className="destination-map-legend-label">Low</span>
+        <div className="destination-map-legend-colors">
+          {["#E8F4F8", "#4A90E2", "#1E7FB8", "#0F4C75", "#002B49"].map((color, i) => (
+            <div 
+              key={i}
+              className="destination-map-legend-color"
+              style={{ backgroundColor: color }}
+            />
           ))}
-        </Pie>
-        <Tooltip 
-          formatter={(value, name, props) => [
-            `${value.toLocaleString()} (${props.payload.percentage.toFixed(1)}%)`, 
-            'Emigrants'
-          ]}
-        />
-        <Legend 
-          formatter={(value, entry, index) => (
-            <span style={{ color: '#ccc', fontSize: '14px' }}>
-              {chartData[index]?.name || value}
-            </span>
-          )}
-        />
-      </PieChart>
-    </ResponsiveContainer>
+        </div>
+        <span className="destination-map-legend-label">High</span>
+      </div>
+    </div>
   );
 });
 
@@ -630,15 +1278,15 @@ const FullScreenChart = React.memo(({ title, children, onClose, isOpen }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fullscreen-chart-overlay">
-      <div className="fullscreen-chart-container">
-        <div className="fullscreen-chart-header">
+    <div className="destination-fullscreen-chart-overlay">
+      <div className="destination-fullscreen-chart-container">
+        <div className="destination-fullscreen-chart-header">
           <h3>{title}</h3>
-          <button className="close-fullscreen" onClick={onClose}>
+          <button className="destination-close-fullscreen" onClick={onClose}>
             <FiMinimize /> Close
           </button>
         </div>
-        <div className="fullscreen-chart-content">
+        <div className="destination-fullscreen-chart-content">
           {children}
         </div>
       </div>
@@ -652,7 +1300,8 @@ const DestinationCountriesPage = ({ rawData }) => {
   const [chartFilters, setChartFilters] = useState({
     bar: { year: 'all' },
     line: { yearRange: [1981, 2020], countryCount: 5 },
-    pie: { year: 'all' }
+    pie: { year: 'all' },
+    map: { year: 'all' }
   });
 
   const countriesData = useMemo(() => {
@@ -686,6 +1335,13 @@ const DestinationCountriesPage = ({ rawData }) => {
     }));
   };
 
+  const updateMapFilter = (year) => {
+    setChartFilters(prev => ({
+      ...prev,
+      map: { year }
+    }));
+  };
+
   const handleFullscreenToggle = (chartTitle) => {
     setFullScreenChart(fullScreenChart === chartTitle ? null : chartTitle);
   };
@@ -702,6 +1358,8 @@ const DestinationCountriesPage = ({ rawData }) => {
         />;
       case "Country Composition":
         return <FullScreenPieChart data={countriesData} selectedYear={chartFilters.pie.year} />;
+      case "Emigrants Distribution Map":
+        return <FullScreenMap data={countriesData} selectedYear={chartFilters.map.year} />;
       default:
         return null;
     }
@@ -709,7 +1367,7 @@ const DestinationCountriesPage = ({ rawData }) => {
 
   return (
     <div className="destination-countries-page">
-      <div className="page-header">
+      <div className="destination-page-header">
         <h2><FiGlobe /> Destination Countries</h2>
         <p>Visualize where Filipinos migrate most</p>
       </div>
@@ -725,24 +1383,16 @@ const DestinationCountriesPage = ({ rawData }) => {
             {renderFullScreenContent()}
           </FullScreenChart>
 
-          {/* Charts Grid - Bar and Pie side by side, Multi-line below */}
-          <div className={`charts-grid ${fullScreenChart ? 'blurred' : ''}`}>
-            <div className="side-by-side-charts">
-              <TopCountriesBarChart 
-                data={countriesData}
-                selectedYear={chartFilters.bar.year}
-                onYearChange={updateBarFilter}
-                onFullscreen={() => handleFullscreenToggle("Top 10 Destination Countries")}
-              />
-              
-              <CountryCompositionPieChart 
-                data={countriesData}
-                selectedYear={chartFilters.pie.year}
-                onYearChange={updatePieFilter}
-                onFullscreen={() => handleFullscreenToggle("Country Composition")}
-              />
-            </div>
-            
+          {/* BIG MAP AT THE TOP - DOMINANT FEATURE */}
+          <ChoroplethMap 
+            data={countriesData}
+            selectedYear={chartFilters.map.year}
+            onYearChange={updateMapFilter}
+            onFullscreen={() => handleFullscreenToggle("Emigrants Distribution Map")}
+          />
+
+          {/* TREND CHART - FULL WIDTH */}
+          <div className={`destination-trend-chart-container ${fullScreenChart ? 'blurred' : ''}`}>
             <MultiLineTrendChart 
               data={countriesData}
               yearRange={chartFilters.line.yearRange}
@@ -752,9 +1402,29 @@ const DestinationCountriesPage = ({ rawData }) => {
               onFullscreen={() => handleFullscreenToggle("Emigration Trends")}
             />
           </div>
+
+          {/* BAR CHART - FULL WIDTH */}
+          <div className={`destination-full-width-chart ${fullScreenChart ? 'blurred' : ''}`}>
+            <TopCountriesBarChart 
+              data={countriesData}
+              selectedYear={chartFilters.bar.year}
+              onYearChange={updateBarFilter}
+              onFullscreen={() => handleFullscreenToggle("Top 10 Destination Countries")}
+            />
+          </div>
+
+          {/* COMPOSITION CHART - FULL WIDTH */}
+          <div className={`destination-full-width-chart ${fullScreenChart ? 'blurred' : ''}`}>
+            <CountryCompositionPieChart 
+              data={countriesData}
+              selectedYear={chartFilters.pie.year}
+              onYearChange={updatePieFilter}
+              onFullscreen={() => handleFullscreenToggle("Country Composition")}
+            />
+          </div>
         </>
       ) : (
-        <div className="empty-state">
+        <div className="destination-empty-state">
           <FiAlertCircle size={48} />
           <h3>No Data Available</h3>
           <p>Please upload data in the CSV Upload section.</p>
