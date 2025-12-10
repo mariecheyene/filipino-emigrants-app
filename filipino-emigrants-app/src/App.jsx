@@ -1,8 +1,10 @@
+// src/App.js
 import React, { useState, useEffect, useCallback } from "react";
 import { 
   FiMenu, FiShield, FiRefreshCw, FiHome, FiUsers, 
   FiUser, FiCalendar, FiBook, FiBriefcase, FiMapPin, 
-  FiMap, FiGlobe, FiActivity, FiUpload, FiDatabase 
+  FiMap, FiGlobe, FiActivity, FiUpload, FiDatabase,
+  FiTrendingUp
 } from 'react-icons/fi';
 
 // Import all pages
@@ -18,6 +20,7 @@ import DestinationCountriesPage from './pages/DestinationCountriesPage';
 import ComparisonsPage from './pages/ComparisonsPage';
 import CsvUploadPage from './pages/CsvUploadPage';
 import EmigrantsRecords from './pages/EmigrantsRecords';
+import ForecastingPage from './pages/ForecastingPage';
 
 // Import your emigrantsService directly
 import { 
@@ -131,8 +134,9 @@ function App() {
     { id: 'province-origin', label: 'Place of Origin (Province)', icon: <FiMap /> },
     { id: 'destination-countries', label: 'Destination Countries', icon: <FiGlobe /> },
     { id: 'comparisons', label: 'Comparisons & Relationships', icon: <FiActivity /> },
+    { id: 'forecasting', label: 'Emigrant Forecasting', icon: <FiTrendingUp /> },
     { id: 'csv-upload', label: 'Data Uploads', icon: <FiUpload /> },
-    { id: 'emigrant-records', label: 'Emigrant Records', icon: <FiDatabase /> }, // Moved to bottom
+    { id: 'emigrant-records', label: 'Emigrant Records', icon: <FiDatabase /> },
   ];
 
   const dataTypes = [
@@ -194,6 +198,8 @@ function App() {
         return <DestinationCountriesPage {...commonProps} />;
       case 'comparisons':
         return <ComparisonsPage {...commonProps} />;
+      case 'forecasting':
+        return <ForecastingPage {...commonProps} />;
       case 'csv-upload':
         return <CsvUploadPage {...commonProps} />;
       case 'emigrant-records':
