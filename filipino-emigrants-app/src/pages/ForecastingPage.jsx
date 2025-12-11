@@ -1,85 +1,94 @@
-// src/pages/ForecastingPage.jsx
-import React from 'react';
+// src/pages/ForecastingPage.jsx - FIXED VERSION
+import React, { useState } from 'react';
+import SimpleForecastDisplay from '../components/SimpleForecastDisplay';
 import LSTMForecast from '../components/LSTMForecast';
 import MLPForecast from '../components/MLPForecast';
+import '../css/ForecastingPage.css';
 
 export default function ForecastingPage({ rawData }) {
-  // Prepare sex data for forecasting
-  const sexData = rawData?.sexData || [];
+  const [activeModel, setActiveModel] = useState('LSTM');
+  const [viewMode, setViewMode] = useState('forecast'); // 'forecast' or 'train'
+
+  // Prepare sex data
+  const sexData = rawData.sexData || [];
   
-  // Calculate data statistics
-  const dataStats = {
-    totalYears: sexData.length,
-    yearRange: sexData.length > 0 ? 
-      `${sexData[0]?.year} - ${sexData[sexData.length - 1]?.year}` : 'No data',
-    latestYear: sexData.length > 0 ? sexData[sexData.length - 1]?.year : null,
-    latestMale: sexData.length > 0 ? sexData[sexData.length - 1]?.male || 0 : 0,
-    latestFemale: sexData.length > 0 ? sexData[sexData.length - 1]?.female || 0 : 0,
-    latestTotal: sexData.length > 0 ? 
-      (Number(sexData[sexData.length - 1]?.male || 0) + Number(sexData[sexData.length - 1]?.female || 0)) : 0
-  };
+  const forecastData = sexData.map(item => ({
+    year: item.year,
+    male: item.male || 0,
+    female: item.female || 0,
+    emigrants: (item.male || 0) + (item.female || 0)
+  })).sort((a, b) => a.year - b.year);
 
   return (
     <div className="forecasting-page">
+      {/* Header */}
       <div className="page-header">
-        <h1>📈 Filipino Emigrant Forecasting</h1>
-        <p className="page-description">
-          Machine learning-based forecasting of Filipino emigrant trends using LSTM and MLP models
-        </p>
+        <h2>📈 Emigrant Forecasting</h2>
       </div>
 
-      {/* Data Summary */}
-      <div className="data-summary">
-        <div className="summary-card">
-          <h3>📊 Data Overview</h3>
-          <div className="summary-content">
-            <p><strong>Total Years of Data:</strong> {dataStats.totalYears}</p>
-            <p><strong>Year Range:</strong> {dataStats.yearRange}</p>
-            {dataStats.latestYear && (
-              <>
-                <p><strong>Latest Data ({dataStats.latestYear}):</strong></p>
-                <ul>
-                  <li>Male Emigrants: {dataStats.latestMale.toLocaleString()}</li>
-                  <li>Female Emigrants: {dataStats.latestFemale.toLocaleString()}</li>
-                  <li><strong>Total Emigrants: {dataStats.latestTotal.toLocaleString()}</strong></li>
-                </ul>
-              </>
-            )}
-          </div>
+      {/* Model Selection Tabs */}
+      <div className="model-tabs-container">
+        <div className="model-tabs">
+          <button
+            className={`model-tab ${activeModel === 'LSTM' ? 'active' : ''}`}
+            onClick={() => setActiveModel('LSTM')}
+          >
+            <span className="model-icon">🧠</span>
+            LSTM
+          </button>
+          
+          <button
+            className={`model-tab ${activeModel === 'MLP' ? 'active' : ''}`}
+            onClick={() => setActiveModel('MLP')}
+          >
+            <span className="model-icon">🔢</span>
+            MLP
+          </button>
         </div>
-        
-        <div className="summary-card">
-          <h3>🎯 Model Comparison</h3>
-          <div className="summary-content">
-            <p><strong>LSTM (Long Short-Term Memory):</strong> Best for time series patterns</p>
-            <p><strong>MLP (Multi-Layer Perceptron):</strong> Best for complex relationships</p>
-            <p><strong>Forecast Period:</strong> Up to 10 years into the future</p>
-            <p><strong>Validation:</strong> 20% split for testing</p>
-          </div>
+
+        {/* View Mode Toggle */}
+        <div className="view-toggle">
+          <button
+            className={`view-btn ${viewMode === 'forecast' ? 'active' : ''}`}
+            onClick={() => setViewMode('forecast')}
+          >
+            Forecast
+          </button>
+          <button
+            className={`view-btn ${viewMode === 'train' ? 'active' : ''}`}
+            onClick={() => setViewMode('train')}
+          >
+            Train Model
+          </button>
         </div>
       </div>
 
-      {/* Warning if insufficient data */}
-      {sexData.length < 8 && (
-        <div className="warning-message">
-          <h3>⚠️ Insufficient Data Warning</h3>
-          <p>
-            You have {sexData.length} years of data. For reliable forecasting, 
-            at least 8 years of historical data is recommended. 
-            The models may not produce accurate predictions with limited data.
-          </p>
-        </div>
+      {/* Main Content - REMOVE THE EXTRA WRAPPERS! */}
+      {viewMode === 'forecast' ? (
+        // NO forecast-section wrapper!
+        <SimpleForecastDisplay 
+          data={forecastData}
+          modelType={activeModel}
+        />
+      ) : (
+        // NO training-section wrapper!
+        activeModel === 'LSTM' ? (
+          <LSTMForecast data={forecastData} />
+        ) : (
+          <MLPForecast data={forecastData} />
+        )
       )}
 
-      {/* LSTM Forecasting Section */}
-      <section className="forecast-section">
-        <LSTMForecast data={sexData} />
-      </section>
-
-      {/* MLP Forecasting Section */}
-      <section className="forecast-section">
-        <MLPForecast data={sexData} />
-      </section>
+      {/* Quick Info */}
+      <div className="quick-info">
+        <p><strong>📋 How it works:</strong></p>
+        <ol>
+          <li>Go to <strong>"Train Model"</strong> tab to train a {activeModel} model</li>
+          <li>Switch to <strong>"Forecast"</strong> tab to generate predictions</li>
+          <li>System automatically uses the best trained model</li>
+          <li>No training needed when generating forecasts</li>
+        </ol>
+      </div>
     </div>
   );
 }

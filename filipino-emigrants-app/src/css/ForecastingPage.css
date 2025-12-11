@@ -1,0 +1,197 @@
+/* src/css/ForecastingPage.css - FIXED VERSION */
+.forecasting-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.page-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.page-header h2 {
+  color: #e2e8f0;
+  font-size: 2rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Model Selection Tabs */
+.model-tabs-container {
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  border: 1px solid #475569;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.model-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.model-tab {
+  background: #334155;
+  color: #cbd5e1;
+  border: 2px solid #475569;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.model-tab:hover {
+  background: #475569;
+  transform: translateY(-2px);
+}
+
+.model-tab.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.model-icon {
+  font-size: 1.2rem;
+}
+
+/* View Toggle */
+.view-toggle {
+  display: flex;
+  gap: 10px;
+  background: #334155;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.view-btn {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.view-btn:hover {
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.view-btn.active {
+  background: #475569;
+  color: #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* REMOVED: forecast-section and training-section styles */
+/* These wrappers are removed from the JSX, so remove their CSS */
+
+/* Quick Info */
+.quick-info {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8) 100%);
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #475569;
+  margin-top: 20px;
+}
+
+.quick-info p {
+  color: #e2e8f0;
+  margin: 0 0 16px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.quick-info ol {
+  color: #cbd5e1;
+  padding-left: 20px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.quick-info li {
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.quick-info li:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .model-tabs-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .model-tabs {
+    justify-content: center;
+  }
+  
+  .view-toggle {
+    align-self: stretch;
+    justify-content: center;
+  }
+  
+  .quick-info {
+    padding: 20px;
+  }
+}
+
+/* Keep animation but apply to all forecast-panels */
+.forecast-panel {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure charts are visible */
+.recharts-wrapper {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+.recharts-cartesian-axis-tick-value {
+  fill: #94a3b8;
+  font-size: 12px;
+}
+
+.recharts-legend-item-text {
+  color: #cbd5e1 !important;
+  font-size: 14px;
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}

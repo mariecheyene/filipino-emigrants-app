@@ -1,8 +1,8 @@
-// src/components/LSTMForecast.jsx
-import React, { useState, useRef } from 'react';
+// src/components/LSTMForecast.jsx - MODIFIED (Keep training, remove "Load Best Model")
+import React, { useState, useRef, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { cleanData, sortData, normalizeData, denormalize, createSequences, calculateMetrics } from '../utils/dataPreparation';
-import { buildLSTMModel, trainLSTMModel, predictLSTM, saveLSTMModel, loadLSTMModel, deleteLSTMModel, downloadLSTMModel } from '../models/lstmModel';
+import { buildLSTMModel, trainLSTMModel, predictLSTM, saveLSTMModel, loadLSTMModel, deleteLSTMModel, downloadLSTMModel, uploadLSTMModelFromFile } from '../models/lstmModel';
 import './ForecastPanel.css';
 
 export default function LSTMForecast({ data }) {
@@ -20,39 +20,58 @@ export default function LSTMForecast({ data }) {
   const FEATURES = ['emigrants'];
   const TARGET = 'emigrants';
 
-  // Prepare sex data for forecasting - Convert male+female to total emigrants
-  const prepareSexData = () => {
-    if (!data || !Array.isArray(data)) return [];
+  // Load saved forecasts on component mount
+  useEffect(() => {
+    const savedForecasts = localStorage.getItem('lstm_forecasts');
+    if (savedForecasts) {
+      try {
+        setForecasts(JSON.parse(savedForecasts));
+      } catch (e) {
+        console.error('Error loading saved forecasts:', e);
+      }
+    }
     
-    return data
-      .filter(item => item.year && (item.male !== undefined || item.female !== undefined))
-      .map(item => {
-        const male = Number(item.male) || 0;
-        const female = Number(item.female) || 0;
-        const total = male + female;
-        
-        return {
-          year: Number(item.year),
-          emigrants: total
-        };
-      })
-      .sort((a, b) => a.year - b.year);
-  };
+    const savedYears = localStorage.getItem('lstm_forecast_years');
+    if (savedYears) {
+      setForecastYears(parseInt(savedYears));
+    }
+  }, []);
+
+  // Save forecasts to localStorage whenever they change
+  useEffect(() => {
+    if (forecasts.length > 0) {
+      localStorage.setItem('lstm_forecasts', JSON.stringify(forecasts));
+      localStorage.setItem('lstm_forecast_years', forecastYears.toString());
+    }
+  }, [forecasts, forecastYears]);
 
   const handleTrain = async () => {
-    const preparedData = prepareSexData();
-    
-    if (preparedData.length < LOOKBACK + 5) {
-      alert(`Need at least ${LOOKBACK + 5} years of data for training. Currently have ${preparedData.length}.`);
-      return;
-    }
-
     setIsTraining(true);
     setTrainingProgress({ epoch: 0, loss: 0, mae: 0 });
     setMetrics(null);
     setValidationResults([]);
 
     try {
+      const preparedData = Array.isArray(data) ? data
+        .filter(item => item && item.year && (item.male !== undefined || item.female !== undefined))
+        .map(item => {
+          const male = Number(item.male) || 0;
+          const female = Number(item.female) || 0;
+          const total = male + female;
+          
+          return {
+            year: Number(item.year),
+            emigrants: total
+          };
+        })
+        .sort((a, b) => a.year - b.year) : [];
+
+      if (preparedData.length < LOOKBACK + 5) {
+        alert(`Need at least ${LOOKBACK + 5} years of data for training. Currently have ${preparedData.length}.`);
+        setIsTraining(false);
+        return;
+      }
+
       let cleanedData = cleanData(preparedData);
       cleanedData = sortData(cleanedData);
 
@@ -74,19 +93,15 @@ export default function LSTMForecast({ data }) {
       await trainLSTMModel(newModel, X, y, onEpochEnd, 100, 0.2);
 
       const normalizedPredictions = await predictLSTM(newModel, X);
-
       const predictions = normalizedPredictions.map(pred =>
         denormalize(pred, mins[TARGET], maxs[TARGET])
       );
-
       const actualValues = y.map(val =>
         denormalize(val, mins[TARGET], maxs[TARGET])
       );
 
-      // Create validation results table data
       const trainSize = Math.floor(actualValues.length * 0.8);
       const resultsData = [];
-
       for (let i = trainSize; i < actualValues.length; i++) {
         const dataIndex = i + LOOKBACK;
         if (dataIndex < cleanedData.length) {
@@ -98,14 +113,18 @@ export default function LSTMForecast({ data }) {
           });
         }
       }
-
       setValidationResults(resultsData);
 
       const calculatedMetrics = calculateMetrics(actualValues, predictions);
+      console.log('📊 LSTM Model Metrics:', calculatedMetrics); // Debug log
       setMetrics(calculatedMetrics);
 
+      // Generate unique ID for this model
+      const modelId = `lstm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
       const newMetadata = {
         modelType: 'LSTM',
+        modelId: modelId,
         lookback: LOOKBACK,
         features: FEATURES,
         target: TARGET,
@@ -123,10 +142,25 @@ export default function LSTMForecast({ data }) {
       setModel(newModel);
       setMetadata(newMetadata);
 
-      alert(`LSTM model trained successfully!\nAccuracy: ${calculatedMetrics.accuracy}%`);
+      // Track best model automatically
+      const bestModelInfo = JSON.parse(localStorage.getItem('LSTM_best_model') || '{}');
+      const currentAccuracy = parseFloat(calculatedMetrics.accuracy);
+      const bestAccuracy = parseFloat(bestModelInfo.accuracy || 0);
+
+      if (currentAccuracy > bestAccuracy) {
+        const bestInfo = {
+          modelId: modelId,
+          accuracy: calculatedMetrics.accuracy,
+          trainedAt: newMetadata.trainedAt,
+          metrics: calculatedMetrics
+        };
+        localStorage.setItem('LSTM_best_model', JSON.stringify(bestInfo));
+      }
+
+      alert(`✅ LSTM model trained successfully!\nAccuracy: ${calculatedMetrics.accuracy}%\nModel ID: ${modelId}`);
     } catch (error) {
       console.error('Training error:', error);
-      alert('Error training model: ' + error.message);
+      alert('❌ Error training model: ' + error.message);
     } finally {
       setIsTraining(false);
     }
@@ -139,13 +173,13 @@ export default function LSTMForecast({ data }) {
         setModel(result.model);
         setMetadata(result.metadata);
         setMetrics(result.metadata.metrics);
-        alert('LSTM model loaded successfully!');
+        alert('✅ LSTM model loaded successfully!');
       } else {
-        alert('No saved model found. Please train a model first.');
+        alert('⚠️ No saved model found. Please train a model first.');
       }
     } catch (error) {
       console.error('Error loading model:', error);
-      alert('Error loading model: ' + error.message);
+      alert('❌ Error loading model: ' + error.message);
     }
   };
 
@@ -160,37 +194,55 @@ export default function LSTMForecast({ data }) {
     if (!file) return;
 
     if (!file.name.endsWith('.json')) {
-      alert('Please upload a JSON model file');
+      alert('❌ Please upload a JSON file (.json)');
       return;
     }
 
     try {
-      const text = await file.text();
-      const uploadedMetadata = JSON.parse(text);
+      // Show loading - use setIsTraining instead of setIsLoading
+      setIsTraining(true);
       
-      // Basic validation
-      if (!uploadedMetadata.modelType || uploadedMetadata.modelType !== 'LSTM') {
-        alert('This is not a valid LSTM model file');
-        return;
+      // Use the new upload function
+      const result = await uploadLSTMModelFromFile(file);
+      
+      if (result) {
+        setModel(result.model);
+        setMetadata(result.metadata);
+        setMetrics(result.metadata.metrics || {});
+        
+        // Update best model if this one is better
+        const currentAccuracy = parseFloat(result.metadata.metrics?.accuracy || 0);
+        const bestModelInfo = JSON.parse(localStorage.getItem('LSTM_best_model') || '{}');
+        const bestAccuracy = parseFloat(bestModelInfo.accuracy || 0);
+        
+        if (currentAccuracy > bestAccuracy) {
+          const bestInfo = {
+            modelId: result.modelId,
+            accuracy: result.metadata.metrics?.accuracy || 'N/A',
+            trainedAt: result.metadata.trainedAt,
+            metrics: result.metadata.metrics
+          };
+          localStorage.setItem('LSTM_best_model', JSON.stringify(bestInfo));
+        }
+        
+        alert(`✅ LSTM model uploaded successfully!\n\n` +
+              `Accuracy: ${result.metadata.metrics?.accuracy || 'N/A'}%\n` +
+              `Trained: ${new Date(result.metadata.trainedAt || Date.now()).toLocaleDateString()}`);
+      } else {
+        alert('❌ Failed to upload model');
       }
-
-      // Load the model architecture and weights
-      const model = await tf.loadLayersModel(`file://${file.name}`);
       
-      // Set the loaded model
-      setModel(model);
-      setMetadata(uploadedMetadata);
-      setMetrics(uploadedMetadata.metrics);
-      
-      alert('LSTM model uploaded successfully!');
+      event.target.value = '';
     } catch (error) {
       console.error('Error uploading model:', error);
-      alert('Error uploading model: ' + error.message);
+      alert('❌ Error uploading model: ' + error.message);
+    } finally {
+      setIsTraining(false);
     }
   };
 
   const handleDeleteModel = async () => {
-    if (!confirm('Are you sure you want to delete the saved LSTM model?')) return;
+    if (!confirm('⚠️ Are you sure you want to delete the saved LSTM model?')) return;
 
     try {
       await deleteLSTMModel();
@@ -199,31 +251,36 @@ export default function LSTMForecast({ data }) {
       setMetrics(null);
       setForecasts([]);
       setValidationResults([]);
-      alert('LSTM model deleted successfully!');
+      
+      localStorage.removeItem('lstm_forecasts');
+      localStorage.removeItem('lstm_forecast_years');
+      localStorage.removeItem('LSTM_best_model');
+      
+      alert('✅ LSTM model deleted successfully!');
     } catch (error) {
       console.error('Error deleting model:', error);
-      alert('Error deleting model: ' + error.message);
+      alert('❌ Error deleting model: ' + error.message);
     }
   };
 
   const handleDownloadModel = async () => {
     if (!model || !metadata) {
-      alert('No model to download. Please train a model first.');
+      alert('⚠️ No model to download. Please train a model first.');
       return;
     }
 
     try {
       await downloadLSTMModel(model, metadata);
-      alert('LSTM model files downloaded!');
+      alert('✅ LSTM model file downloaded!');
     } catch (error) {
       console.error('Error downloading model:', error);
-      alert('Error downloading model: ' + error.message);
+      alert('❌ Error downloading model: ' + error.message);
     }
   };
 
   const handleForecast = async () => {
     if (!model || !metadata) {
-      alert('Please train, load, or upload a model first.');
+      alert('⚠️ Please train, load, or upload a model first.');
       return;
     }
 
@@ -263,24 +320,32 @@ export default function LSTMForecast({ data }) {
       }
 
       setForecasts(predictions);
-      alert(`Generated ${forecastYears} year LSTM forecast!`);
+      alert(`✅ Generated ${forecastYears} year LSTM forecast!`);
     } catch (error) {
       console.error('Forecasting error:', error);
-      alert('Error generating forecast: ' + error.message);
+      alert('❌ Error generating forecast: ' + error.message);
     }
   };
 
-  // Prepare chart data
-  const historicalData = prepareSexData().map(item => ({
-    year: item.year.toString(),
-    emigrants: item.emigrants,
-    isForecast: false
-  }));
+  const historicalData = Array.isArray(data) ? data
+    .filter(item => item && (item.male !== undefined || item.female !== undefined))
+    .map(item => {
+      const male = Number(item.male) || 0;
+      const female = Number(item.female) || 0;
+      const total = male + female;
+      
+      return {
+        year: item.year?.toString() || '',
+        emigrants: total,
+        isForecast: false
+      };
+    })
+    .sort((a, b) => parseInt(a.year) - parseInt(b.year)) : [];
 
-  const forecastData = forecasts.map(f => ({
+  const forecastData = Array.isArray(forecasts) ? forecasts.map(f => ({
     ...f,
     isForecast: true
-  }));
+  })) : [];
 
   const chartData = [...historicalData, ...forecastData];
 
@@ -290,13 +355,13 @@ export default function LSTMForecast({ data }) {
       <p className="subtitle">Time-series forecasting using Long Short-Term Memory neural networks</p>
 
       <div className="control-buttons">
-        <button onClick={handleTrain} disabled={isTraining}>
-          {isTraining ? 'Training...' : 'Train LSTM Model'}
+        <button onClick={handleTrain} disabled={isTraining} className="train-btn">
+          {isTraining ? '🔄 Training...' : '🚀 Train LSTM Model'}
         </button>
-        <button onClick={handleLoadModel} disabled={isTraining}>
-          Load Model
+        <button onClick={handleLoadModel} disabled={isTraining} className="load-btn">
+          📂 Load Model
         </button>
-        <button onClick={handleUploadModel} disabled={isTraining}>
+        <button onClick={handleUploadModel} disabled={isTraining} className="upload-btn">
           📤 Upload Model
         </button>
         <input
@@ -306,11 +371,11 @@ export default function LSTMForecast({ data }) {
           accept=".json"
           style={{ display: 'none' }}
         />
-        <button onClick={handleDeleteModel} disabled={isTraining || !model}>
-          Delete Model
+        <button onClick={handleDeleteModel} disabled={isTraining || !model} className="delete-btn">
+          🗑️ Delete Model
         </button>
-        <button onClick={handleDownloadModel} disabled={isTraining || !model}>
-          Download Model
+        <button onClick={handleDownloadModel} disabled={isTraining || !model} className="download-btn">
+          💾 Download Model
         </button>
       </div>
 
@@ -347,6 +412,10 @@ export default function LSTMForecast({ data }) {
               <div className="metric-item">
                 <span className="metric-label">RMSE</span>
                 <span className="metric-value">{metrics.rmse}</span>
+              </div>
+              <div className="metric-item">
+                <span className="metric-label">MAPE</span>
+                <span className="metric-value">{metrics.mape}%</span>
               </div>
               <div className="metric-item">
                 <span className="metric-label">R² Score</span>
@@ -405,7 +474,14 @@ export default function LSTMForecast({ data }) {
                 onChange={(e) => setForecastYears(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
               />
             </label>
-            <button onClick={handleForecast}>Generate Forecast</button>
+            <div className="button-group">
+              <button onClick={handleForecast} className="forecast-btn">
+                🔮 Generate Forecast
+              </button>
+              <button onClick={handleLoadModel} className="refresh-btn">
+                🔄 Refresh Model Info
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -503,45 +579,19 @@ export default function LSTMForecast({ data }) {
         </>
       )}
 
-      {/* Centered Model Configuration */}
-      <div className="model-config-container">
-        <div className="model-config-box">
-          <h4>LSTM Model Configuration</h4>
-          <div className="config-grid">
-            <div className="config-item">
-              <span className="config-label">Architecture</span>
-              <span className="config-value">2 LSTM layers (50 units each)</span>
-            </div>
-            <div className="config-item">
-              <span className="config-label">Lookback Window</span>
-              <span className="config-value">{LOOKBACK} years</span>
-            </div>
-            <div className="config-item">
-              <span className="config-label">Input Features</span>
-              <span className="config-value">Historical emigrant counts</span>
-            </div>
-            <div className="config-item">
-              <span className="config-label">Target</span>
-              <span className="config-value">Next year's emigrant count</span>
-            </div>
-            <div className="config-item">
-              <span className="config-label">Dropout Rate</span>
-              <span className="config-value">0.2</span>
-            </div>
-            <div className="config-item">
-              <span className="config-label">Training Epochs</span>
-              <span className="config-value">100</span>
-            </div>
-            <div className="config-item">
-              <span className="config-label">Validation Split</span>
-              <span className="config-value">20%</span>
-            </div>
-            <div className="config-item">
-              <span className="config-label">Optimizer</span>
-              <span className="config-value">Adam (lr=0.001)</span>
-            </div>
-          </div>
-        </div>
+      <div className="model-config-centered">
+        <h4>LSTM Model Configuration</h4>
+        <ul>
+          <li><strong>Architecture:</strong> 2 LSTM layers (104 → 52 units)</li>
+          <li><strong>Lookback Window:</strong> {LOOKBACK} years</li>
+          <li><strong>Input Features:</strong> Historical emigrant counts</li>
+          <li><strong>Target:</strong> Next year's emigrant count</li>
+          <li><strong>Dropout Rate:</strong> 0.025</li>
+          <li><strong>Training Epochs:</strong> 100</li>
+          <li><strong>Validation Split:</strong> 20%</li>
+          <li><strong>Optimizer:</strong> Adam (lr=0.001)</li>
+          <li><strong>Forecasting:</strong> Total Filipino Emigrants</li>
+        </ul>
       </div>
     </div>
   );

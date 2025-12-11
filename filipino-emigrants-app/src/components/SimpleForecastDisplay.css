@@ -1,0 +1,362 @@
+/* src/components/SimpleForecastDisplay.css */
+
+/* Main Panel - EXACTLY like ForecastPanel.css */
+.simple-forecast {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 25px;
+  margin: 20px 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+/* Border colors matching your ForecastPanel */
+.simple-forecast.lstm {
+  border-left: 4px solid #34d399; /* Same as lstm-panel */
+}
+
+.simple-forecast.mlp {
+  border-left: 4px solid #9b59b6; /* Same as mlp-panel */
+}
+
+/* Header - match your style */
+.forecast-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #334155;
+}
+
+.forecast-header h3 {
+  color: #f1f5f9;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+/* Subtitle style if needed */
+.forecast-subtitle {
+  color: #94a3b8;
+  margin-bottom: 25px;
+  font-size: 1rem;
+}
+
+/* Controls - match your style */
+.forecast-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.years-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.years-selector label {
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.years-selector select {
+  background: #0f172a;
+  border: 1px solid #475569;
+  color: #f1f5f9;
+  padding: 10px 15px;
+  border-radius: 8px;
+  min-width: 120px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.years-selector select:hover {
+  border-color: #64748b;
+}
+
+.years-selector select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.generate-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.generate-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.generate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Model Info - match your training results style */
+.model-info {
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid #334155;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.accuracy {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trained-date {
+  background: #475569;
+  color: #cbd5e1;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+/* Error Message - match your style */
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.error-message p {
+  color: #f87171;
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.error-message p:first-child {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* Chart Container - EXACTLY like your chart-container */
+.forecast-chart {
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 25px;
+  margin: 25px 0;
+  border: 1px solid #334155;
+}
+
+.forecast-chart h4 {
+  color: #f1f5f9;
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+  text-align: center;
+}
+
+/* Results Table - EXACTLY like your forecast-results */
+.forecast-table {
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 25px;
+  margin: 25px 0;
+  border: 1px solid #334155;
+}
+
+.forecast-table h4 {
+  color: #f1f5f9;
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+  text-align: center;
+}
+
+.forecast-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.forecast-table thead {
+  background: #1e293b;
+}
+
+.forecast-table th {
+  padding: 15px;
+  text-align: left;
+  color: #f1f5f9;
+  font-weight: 600;
+  border-bottom: 2px solid #334155;
+}
+
+.forecast-table td {
+  padding: 15px;
+  color: #cbd5e1;
+  border-bottom: 1px solid #334155;
+}
+
+.forecast-table tbody tr:hover {
+  background: #1e293b;
+}
+
+/* Column styles */
+.forecast-table td:first-child {
+  font-weight: 500;
+  color: #e2e8f0;
+}
+
+.forecast-table td:nth-child(2) {
+  font-weight: 600;
+  color: #fbbf24;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', monospace;
+}
+
+.positive {
+  color: #34d399 !important;
+  font-weight: 600;
+}
+
+.negative {
+  color: #f87171 !important;
+  font-weight: 600;
+}
+
+/* Chart note */
+.chart-note {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin: 15px 0 0 0;
+  padding: 10px;
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 6px;
+  border-left: 3px solid #475569;
+}
+
+.chart-note strong {
+  color: #cbd5e1;
+}
+
+/* Loading state */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #475569;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design - match your style */
+@media (max-width: 768px) {
+  .forecast-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+  
+  .forecast-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .years-selector {
+    justify-content: space-between;
+  }
+  
+  .generate-btn {
+    justify-content: center;
+  }
+  
+  .model-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+  }
+  
+  .forecast-table {
+    overflow-x: auto;
+  }
+  
+  .forecast-table table {
+    min-width: 400px;
+  }
+}
+/* Add to src/components/SimpleForecastDisplay.css */
+
+/* Refresh button styles */
+.refresh-btn {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Update forecast-controls for better layout */
+.forecast-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* Add a container for multiple buttons */
+.control-buttons-group {
+  display: flex;
+  gap: 10px;
+  margin-left: 10px;
+}
